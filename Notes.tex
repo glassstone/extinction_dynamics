@@ -4,10 +4,67 @@
 
 
 
+Vieira and Almeida-Neto (2014) proposed a stochastic coextinction model to simulate extinction cascades with more complexity than previous models. One major finding contrary to existing (topological) models was that the likelihood of a cascade increases with network connectance in mutualistic networks. However, their model did not explicitly include dynamics. % JO: Dynamics of what?
 
 
 
+Previous studies made the following assumptions:
+\begin{enumerate}
+	\item Coextinction requires the loss of all partners
+	\item Interaction strengths do not matter (i.e. a species survives as long as at least one partner survives, even if if only weakly interacts with that partner)
+	\item Variation in how species depend on their partners was ignored. % JO: I don't understand this.
+\end{enumerate}
 
+Thus, Vieira and Almeida-Neto proposed a model that
+\begin{enumerate}
+	\item incorporates variation in dependences
+	\item relaxes the assumption that coextinction requires the loss of all interaction partners
+\end{enumerate}
+
+Under the proposed model the dependence of species on the interactions controls the likelihood of extinction cascades and thus highly connected networks are more susceptible to cascades. The model is more realistic since it considers the possibility of compensatory effects.
+
+Their model:
+
+Let:
+$d_{ij}$ is the population-level strength of the interaction.\\
+$R_i$ is assumed constant for each species and reflects the intrinsic demographic dependence of species $i$ on the mutualism in question\\
+$P_{ij} = R_i d_{ij}$ is the probability of species $i$ going extinct following the extinction of a mutualistic partner species $j$.\\
+
+Simulations proceed by removing one species at a given trophic level, and removing species from the other set according to $P$. $d_{ij}$ are recalculated after each extinction
+
+
+Where to go from here?
+
+1. In the original work a single value of $R$ is considered for the entire network. This is unrealistic. Different species depend on the interaction with different degrees. This R could also be seen as the participation of the species in a particular network. For instance, if we are studying a frugivory network species that eat insects, but are also included in the network will have smaller R than strict frugivores. Similarly, a species that feed on fruits that we are considering but also on other fruits that, for some reason, are not included in this particular network, has smaller R.  Thus, the R parameter is what defines the boundaries of the network. It would be interesting to perform simulation where R obeys a probability distributions. How different R distributions changes the size and shape of extinction cascades? Are there critical points given by the parameters of these distributions?
+
+2. The authors only explored mutualisms. It would be interesting to test whether their conclusions hold for other interaction types
+
+3. One of the possibilities we discussed was testing the effects of extinction on multilayered networks. This would be the obvious step after step 1. We could start from the simple scenario with 2 interaction types (e.g. mutualism, herbivory) and then explore other combinations. An empirical system that we could play with are defensive mutualisms for which I believe Cecilia might have suitable data.
+
+4. Since the model was designed thinking on mutualisms one extinction can only have negative effects over the partners. However when we think on antagonisms (competition, predation, parasitism), extinctions may favor other species. Since the model is probabilistic, we could also have, Q, which is the probability of density increase after an extinction. P could also change if antagonists increased enough in abundance. we should discuss the feasibility of adding this to the model while keeping it simple.
+
+
+Next steps:
+
+- In the next months I'll play with the R codes in the Supporting information and try to devise an alternate model encompassing option 4 above.
+
+
+
+MP 20150818:
+2. The second step is to think how we can generalize this to antagonist interactions. In antagonistic interactions the loss of a prey species may have a demographic impact on the predator, but the loss of the predator can have a positive impact on the prey - We need to discuss how to generalize the same model to include these possibilities
+
+
+Pij = Rij x dij , if i is a predator
+
+Qij = Rij x dji, if i is a prey species -> probability that i increases in density
+
+if the density increases we could have one iteration step where interaction frequencies are changed by some factor - assuming that population density affects interaction frequencies
+
+
+
+A. response of model output to probabilistic values of R
+B. behavior of model on non-mutualistic interactions
+C. merge multiple networks using multi-layer network approach (perhaps very difficult)
 
 
 
