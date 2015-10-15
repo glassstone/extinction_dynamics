@@ -1,7 +1,9 @@
 
 
-#setwd("/Users/threeprime/Documents/Dropbox/NIMBioS END/extinctions/Analysis") Jimmy
-setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Analysis") #Mathias
+# setwd("/Users/threeprime/Documents/Dropbox/NIMBioS END/extinctions/Analysis") #Jimmy
+# setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Analysis") #Mathias
+
+data_dir <- file.path("..", "Data")
 
 source("coextDeg_beta.R")
 source("coextNumber_beta.R")
@@ -13,6 +15,7 @@ source("netcascade.R")
 # 1 and 1 give uniform-like distribution
 # 3 and 3 give normal-like distribution
 # 4 and 0.1 give a left skewed distribution
+#hist(rbeta(1000,3,0.1)) #to check beta dist
 par(mfrow=c(1,1))
 hist(rbeta(1000,4,0.1)) #to check beta dist
 
@@ -23,15 +26,29 @@ rownames(beta.par)=c("exp","power","unif","normal","left")
 #Different parameter combinations (bet.par)
 #All species have the same initial probability of initial extinction
 
-setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Data")
-nam<-dir() #Plant-pollinator weighted nets
+# path to directory containing empirical networks:
+emp_net_path <- file.path(data_dir, "nets_emp")
+
+# load all networks in that directory
+nam<-dir(path = emp_net_path) #Plant-pollinator weighted nets
 
 #Testing different nets
 list.net.deg<-list()
 list.net.numb<-list()
-for(p in 5:length(nam)){
 
-  mat<-as.matrix(read.table(nam[p])) #importing matrix
+mat_empirical <- list()
+
+for(p in 1:length(nam)){
+	mat_empirical[[p]] <- as.matrix(read.table(nam[p]))
+}
+
+sapply(lapply(mat_empirical, rowSums), min)
+# mat_empirical[[4]] <- NULL
+length(mat_empirical)
+
+for(p in 1:length(mat_empirical)){
+
+  mat <- mat_empirical[[p]]
   if(min(c(rowSums(mat), colSums(mat))) == 0){
     stop("Hey, you have a species in your network that does not interact with any other species. The following functions will get stuck.")}
   
@@ -50,7 +67,7 @@ for(p in 5:length(nam)){
   list.net.numb[[p]]<-list.numb
 }
 
-q=9 #choose net
+q=3 #choose net
 Temp.deg<-list.net.deg[[q]]
 Temp.numb<-list.net.deg[[q]]
 
@@ -63,7 +80,7 @@ axis(1, at=1:5, label=rownames(beta.par))
 
 #Results
 #Changing the distributions have small effects
-#The liklelihood of large cascades only increase for left skewed distribuition of R
+#The likelihood of large cascades only increase for left skewed distribuition of R
 
 #To do
 #1.Targeted extinctions (JO)
@@ -74,9 +91,6 @@ axis(1, at=1:5, label=rownames(beta.par))
 
 #4.What happens if distributions are different for plants and pollinators?
 #5.Measure the number of extinctions of plants and animals separately
-
-
-
 
 
 #Random weighted net
