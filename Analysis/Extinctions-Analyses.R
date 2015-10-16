@@ -3,14 +3,26 @@
 #Exploring the stochastic coextinction model (Vieira and Almeida Neto 2015 - Ecol Lett)
 #=============================================================================
 
+# Set path to the project folder:
+# MMP: project_dir <- "/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions"
+# JO:  project_dir <- "/Users/jimmy.odonnell/Projects/extinction_dynamics"
+
+setwd(project_dir)
+
+# load original functions (everything in the folder "Analysis/functions")
+sapply(dir(path = "./Analysis/functions", full.names = TRUE), source)
 
 #..............................
 #Testing functions with a sample matrix
 m<-10
 n<-5
 mat<-matrix(rbinom(100,10,0.1),m,n) #random weighted network
-coextDeg(mat,0.9,1,100) #extinction degree (the number of times one extinction spreads to the other set of species)
-coextNumber(mat,0.1,0.4,100)#number of coextinction
+
+#extinction degree (the number of times one extinction spreads to the other set of species)
+coextDeg(mat,0.9,1,100)
+
+#number of coextinction
+coextNumber(mat,0.1,0.4,100)
 #..............................
 
 
