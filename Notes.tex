@@ -4,13 +4,16 @@
 
 
 \subsubsection*{Background}
-Vieira and Almeida-Neto (2014) proposed a stochastic coextinction model to simulate extinction cascades with more complexity than previous models. One major finding contrary to existing (topological) models was that the likelihood of a cascade increases with network connectance in mutualistic networks. However, their model did not explicitly include dynamics. % JO: Dynamics of what?
+Vieira and Almeida-Neto (2014) proposed a stochastic coextinction model to simulate extinction cascades with more complexity than previous models. One major finding contrary to existing (topological coextinction) models (TCM) was that the likelihood and severity (degree; ``the number of extinction episodes, with each episode involving one or more species, summed across both tropic levels'') of a cascade increases with network connectance in mutualistic networks. Their model (1) picked species at random for the primary extinction event, and (2) incorporated information about the species' dependence on the interaction, $R$, but drew this value randomly from a uniform distribution, independent of other properties of the species, and applied the same value to all species. Importantly, they showed that $R$ chosen from either low, medium, or high values has substantial impact on the outcome of the extinction cascade (probability of a cascade, mean number of extinctions, proportion spp lost). However, we know that not all species are equally prone to extinction, and the dependence of a species on an interaction network can covary with other properties of the species. We build upon their model by modifying the parameter $R$, with the goal of making coextinction simulations more realistic by incorporating information from ecological networks and conducting simulations on both empirical and simulated datasets. We report how the covariation between species' network traits (e.g. degree, strength, specialization) and their dependence on a network $R$ impacts coextinction cascades. Further, we assess differences in network structure and species' traits before and after extinction cascades.
+Further, we test our model on simulated networks generated according to parameters that people seem to think are important properties of mutualistic networks. 
+
+What are the properties of all of the species; esp - are there differences between the primary extinction and secondary extinction. Is there similarity in network traits of species that never go extinct? 
 
 Previous studies made the following assumptions:
 \begin{enumerate}
 	\item Coextinction requires the loss of all partners
 	\item Interaction strengths do not matter (i.e. a species survives as long as at least one partner survives, even if if only weakly interacts with that partner)
-	\item Variation in how species depend on their partners was ignored. % JO: I don't understand this.
+	\item Variation in how much a species depend on their partners was ignored. For example, plants' ability to self-pollinate is ignored.
 \end{enumerate}
 
 Thus, Vieira and Almeida-Neto proposed a model that
@@ -45,16 +48,38 @@ Simulations proceed by removing one species at a given trophic level, and removi
 
 \end{enumerate}
 
+\subsubsection*{What we've done}
+
+\begin{enumerate}
+	\item{Generalized the model so each species has an R value}
+	\item{R values are sampled from a probability distribution}
+	\item{Exploring how extinctions cascades respond to R distributions with different shapes}	
+\end{enumerate}
+
+
+
+
+
+
 
 \subsubsection*{Next steps/TODO}
 
-\begin{enumerate}
+\begin{itemize}
 
 	\item play with the R codes in the Supporting information and try to devise an alternate model encompassing option 4 above (extension to antagonisms)
 	
 	\item think how we can generalize this to antagonist interactions. In antagonistic interactions the loss of a prey species may have a demographic impact on the predator, but the loss of the predator can have a positive impact on the prey - We need to discuss how to generalize the same model to include these possibilities
-	
-\end{enumerate}
+
+
+	\item First test - How including variable Rvalues (species dependence on interactions) across species change the original results? Use the same network, same rlow, same rup, one set of simulations with one Rvalue (as in Vieira and Almeida-Neto 2015), second set of simulation with several Rvalues
+
+	\item Second test - How different distributions of Rvalues (different ways in which species depend on the mutualism) change the probability of cascades and the number of coextinctions? We could choose uniform, normal and exponential, and few parameter combinations for each (3?)
+
+	\item Third test - Does network topology affect the consequence of multiple Rvalues? Perform a series of tests with networks with different topologies
+
+	\item for all tests besides looking at the number of coextinctions and coextinctions degree we could examine how topology changed
+
+\end{itemize}
 
 \subsubsection*{More thoughts~\ldots}
 
@@ -76,7 +101,8 @@ C. merge multiple networks using multi-layer network approach (perhaps very diff
 
 
 
-
+% Important notes from Vieira:
+%Ri was assumed to be equal for all species and was uniformly sampled in each simulation from three intervals representing low (0 < Ri ? 0.3), intermediate (0.3 < Ri ? 0.6) and high (0.6 < Ri ? 1) intrinsic demographic dependence on the mutualistic interaction for persistence. For each network, we performed 104 simulations for each interval of Ri and constructed empirical frequency distributions for the total number of extinctions in an extinction cascade. We also quantified the degree of each extinction cascade and constructed its corresponding frequency distribution. From this frequency distribution, we calculated, for each network and Ri level, the probability that a primary extinction would result in second-, third- and fourth-degree-or-higher extinction cascades.
 
 
 

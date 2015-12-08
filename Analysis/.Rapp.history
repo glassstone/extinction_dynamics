@@ -1154,3 +1154,4 @@ vec <- round( runif(n = 10, min = -10, max = 10) )
 vec
 vec_norm <- (vec - min(vec))/(max(vec) - min(vec))
 vec_norm
+891/40
