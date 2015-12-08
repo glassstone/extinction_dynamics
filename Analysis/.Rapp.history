@@ -1,1157 +1,1048 @@
-plot_input <- prop_true_small#
+image(#
+    			x = seq(#
+    					from = min(coordinates[, 1] - delta.coord/2), #
+    					to = max(coordinates[,1] + delta.coord/2), #
+    					length = nxdom#
+    					), #
+    			y = seq(#
+    					from = min(coordinates[,2] - delta.coord/2), #
+    					to = max(coordinates[, 2] + delta.coord/2), #
+                    length = nydom#
+                    ), #
+			z = matrix(#
+					data = map.dom, #
+					nrow = nxdom, #
+					ncol = nydom,#
+					byrow = TRUE#
+					), #
+			xlab = "", #
+			ylab = "", #
+			main = "", #
+			cex = 1.5, #
+			cex.lab = 1.5, #
+			col = gg_color_hue(max(map.dom)),#terrain.colors(npopmax), #
+			xlim = c(min(coordinates[,1] - delta.coord/2 - frame), max(coordinates[,1] + delta.coord/2 + frame)), #
+			ylim = c(min(coordinates[,2] - delta.coord/2 - frame), max(coordinates[,2] + delta.coord/2 + frame)), #
+			asp = 1#
+		)#
 #
-# Create plot layout (this looks complicated to allow it to be flexible to different taxa numbers)#
-plot_cols <- ceiling(sqrt(ncol(plot_input)))#
-plot_rows <- ceiling(ncol(plot_input)/plot_cols)#
-plot_layout <- matrix(data = 1:(plot_cols*plot_rows), nrow = plot_rows, byrow = TRUE)#
-layout(plot_layout)#
+    points(#
+    			x = coordinates, #
+    			pch = 8, #16#
+    			cex = 1#
+    			)#
 #
-# plot histograms of the frequency of proportions sampled for each taxon.#
-for (i in 1:ncol(plot_input)){#
-  hist(plot_input[, i], main = taxon_names[i], xlab = "proportion")#
-}
-plot_input <- prop_true_big#
+    title(sub = "Estimated cluster membership")#
 #
-# Create plot layout (this looks complicated to allow it to be flexible to different taxa numbers)#
-plot_cols <- ceiling(sqrt(ncol(plot_input)))#
-plot_rows <- ceiling(ncol(plot_input)/plot_cols)#
-plot_layout <- matrix(data = 1:(plot_cols*plot_rows), nrow = plot_rows, byrow = TRUE)#
-layout(plot_layout)#
-#
-# plot histograms of the frequency of proportions sampled for each taxon.#
-for (i in 1:ncol(plot_input)){#
-  hist(plot_input[, i], main = taxon_names[i], xlab = "proportion")#
-}
-N_samples_small
-prop_true_small
-N_draws		<-	100000#
-#
-set.seed(407744)#
-counts_mat <- apply(#
-					X = prop_true_small, #
-					MARGIN = 1, #
-					FUN = function(x) #
-						rmultinom(size = N_draws, prob = x, n = 1)#
-				)#
-#
-# transpose#
-counts <- t(counts_mat)
-counts_mat
-rowSums(counts_mat)
-colSums(counts_mat)
-counts_vec
-# make into a vector#
-counts_vec <- as.vector(counts)#
-names(counts_vec) <- rep(x = taxon_names, each = samples_small)
-# Original code by Ole Shelton#
-# Hacked up by Jimmy O'Donnell#
-# Comments mostly reflect Jimmy's imperfect understanding of the underlying concepts.#
-#
-library(gtools) # gtools::rdirichlet#
-library(R2jags) # R2jags::jags#
-# Suppose we have an aquarium which contains N_tax taxa#
-N_tax <- 9#
-#
-# Give them names#
-taxon_names <- paste("taxon_", LETTERS[1:N_tax], sep = "")#
-# The distribution of DNA molecules derived from each of the taxa might look like the following#
-# We call these alpha because they eventually become the alpha parameter of the Dirichlet distribution, which sorta determines how likely each component is to be drawn#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-set.seed(407744)#
-DNA_alpha		<- sort(round(runif(N_tax,1,100)), decreasing = TRUE)#
-names(DNA_alpha) <- taxon_names#
-#
-# those same values expressed as proportions#
-DNA_alpha_prop <- DNA_alpha/sum(DNA_alpha)#
-#############################################################################
-# The actual simulation #
-#############################################################################
-#
-# This simulates data that might be expected from high throughput sequencing of PCR amplicons generated from environmental samples: proportional abundance of sequences from each of the taxa/OTUs/dups#
-# draw samples from the Dirichlet distribution, using alpha given by DNA_alpha to approximate the sampling of DNA molecules from the environment#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-# This is incorrect: we call these proportions the "true" proportions because they represent the "true" proportional abundance of DNA from each taxon in the sample.#
-# How many times should we sample?#
-N_samples_small	<-	3#
-set.seed(407744)#
-prop_true_small <- rdirichlet(N_samples_small, DNA_alpha)#
-colnames(prop_true_small) <- taxon_names#
-#############
-# OR...#
-#############
-N_samples_big		<- 100000#
-set.seed(407744)#
-prop_true_big <- rdirichlet(N_samples_big, DNA_alpha)#
-colnames(prop_true_big) <- taxon_names#
-# Set whichever of these as the plot input:#
-plot_input <- prop_true_big#
-#
-# Create plot layout (this looks complicated to allow it to be flexible to different taxa numbers)#
-plot_cols <- ceiling(sqrt(ncol(plot_input)))#
-plot_rows <- ceiling(ncol(plot_input)/plot_cols)#
-plot_layout <- matrix(data = 1:(plot_cols*plot_rows), nrow = plot_rows, byrow = TRUE)#
-layout(plot_layout)#
-#
-# plot histograms of the frequency of proportions sampled for each taxon.#
-for (i in 1:ncol(plot_input)){#
-  hist(plot_input[, i], main = taxon_names[i], xlab = "proportion")#
-}#
-# Using each row of the "true proportion" data frame as probabilities...#
-# essentially: take a draw of 'N_draws' marbles, #
-# and put them into each of some number of bins #
-# with probability of going into each bin given by the "true proportion" row#
-# (repeat n times)#
-#
-N_draws		<-	100000#
-#
-set.seed(407744)#
-counts_mat <- apply(#
-					X = prop_true_small, #
-					MARGIN = 1, #
-					FUN = function(x) #
-						rmultinom(size = N_draws, prob = x, n = 1)#
-				)#
-#
-# transpose#
-counts <- t(counts_mat)#
-#
-# make into a vector#
-counts_vec <- as.vector(counts)#
-names(counts_vec) <- rep(x = taxon_names, each = N_samples_small)
-counts_mat
-#############################################################################
-# This script simulates some data that resembles eDNA sequence data#
-#############################################################################
-#
-# Original code by Ole Shelton#
-# Hacked up by Jimmy O'Donnell#
-# Comments mostly reflect Jimmy's imperfect understanding of the underlying concepts.#
-#
-library(gtools) # gtools::rdirichlet#
-library(R2jags) # R2jags::jags#
-# Suppose we have an aquarium which contains N_tax taxa#
-N_tax <- 9#
-# Give them names#
-taxon_names <- paste("taxon_", LETTERS[1:N_tax], sep = "")#
-# The distribution of DNA molecules derived from each of the taxa might look like the following#
-# We call these alpha because they eventually become the alpha parameter of the Dirichlet distribution, which sorta determines how likely each component is to be drawn#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-set.seed(407744)#
-DNA_alpha		<- sort(round(runif(N_tax,1,100)), decreasing = TRUE)#
-names(DNA_alpha) <- taxon_names#
-#
-# those same values expressed as proportions#
-DNA_alpha_prop <- DNA_alpha/sum(DNA_alpha)#
-#############################################################################
-# The actual simulation #
-#############################################################################
-#
-# This simulates data that might be expected from high throughput sequencing of PCR amplicons generated from environmental samples: proportional abundance of sequences from each of the taxa/OTUs/dups#
-# draw samples from the Dirichlet distribution, using alpha given by DNA_alpha to approximate the sampling of DNA molecules from the environment#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-# This is incorrect: we call these proportions the "true" proportions because they represent the "true" proportional abundance of DNA from each taxon in the sample.#
-# How many times should we sample?#
-N_samples_small	<-	3#
-set.seed(407744)#
-prop_true_small <- rdirichlet(N_samples_small, DNA_alpha)#
-colnames(prop_true_small) <- taxon_names#
-#############
-# OR...#
-#############
-N_samples_big		<- 100000#
-set.seed(407744)#
-prop_true_big <- rdirichlet(N_samples_big, DNA_alpha)#
-colnames(prop_true_big) <- taxon_names#
-# Set whichever of these as the plot input:#
-plot_input <- prop_true_big#
-#
-# Create plot layout (this looks complicated to allow it to be flexible to different taxa numbers)#
-plot_cols <- ceiling(sqrt(ncol(plot_input)))#
-plot_rows <- ceiling(ncol(plot_input)/plot_cols)#
-plot_layout <- matrix(data = 1:(plot_cols*plot_rows), nrow = plot_rows, byrow = TRUE)#
-layout(plot_layout)#
-#
-# plot histograms of the frequency of proportions sampled for each taxon.#
-for (i in 1:ncol(plot_input)){#
-  hist(plot_input[, i], main = taxon_names[i], xlab = "proportion")#
-  abline(h = DNA_alpha_prop[i], col = "red")#
-}
-#############################################################################
-# This script simulates some data that resembles eDNA sequence data#
-#############################################################################
-#
-# Original code by Ole Shelton#
-# Hacked up by Jimmy O'Donnell#
-# Comments mostly reflect Jimmy's imperfect understanding of the underlying concepts.#
-#
-library(gtools) # gtools::rdirichlet#
-library(R2jags) # R2jags::jags#
-# Suppose we have an aquarium which contains N_tax taxa#
-N_tax <- 9#
-# Give them names#
-taxon_names <- paste("taxon_", LETTERS[1:N_tax], sep = "")#
-# The distribution of DNA molecules derived from each of the taxa might look like the following#
-# We call these alpha because they eventually become the alpha parameter of the Dirichlet distribution, which sorta determines how likely each component is to be drawn#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-set.seed(407744)#
-DNA_alpha		<- sort(round(runif(N_tax,1,100)), decreasing = TRUE)#
-names(DNA_alpha) <- taxon_names#
-#
-# those same values expressed as proportions#
-DNA_alpha_prop <- DNA_alpha/sum(DNA_alpha)#
-#############################################################################
-# The actual simulation #
-#############################################################################
-#
-# This simulates data that might be expected from high throughput sequencing of PCR amplicons generated from environmental samples: proportional abundance of sequences from each of the taxa/OTUs/dups#
-# draw samples from the Dirichlet distribution, using alpha given by DNA_alpha to approximate the sampling of DNA molecules from the environment#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-# This is incorrect: we call these proportions the "true" proportions because they represent the "true" proportional abundance of DNA from each taxon in the sample.#
-# How many times should we sample?#
-N_samples_small	<-	3#
-set.seed(407744)#
-prop_true_small <- rdirichlet(N_samples_small, DNA_alpha)#
-colnames(prop_true_small) <- taxon_names#
-#############
-# OR...#
-#############
-N_samples_big		<- 100000#
-set.seed(407744)#
-prop_true_big <- rdirichlet(N_samples_big, DNA_alpha)#
-colnames(prop_true_big) <- taxon_names#
-# Set whichever of these as the plot input:#
-plot_input <- prop_true_big#
-#
-# Create plot layout (this looks complicated to allow it to be flexible to different taxa numbers)#
-plot_cols <- ceiling(sqrt(ncol(plot_input)))#
-plot_rows <- ceiling(ncol(plot_input)/plot_cols)#
-plot_layout <- matrix(data = 1:(plot_cols*plot_rows), nrow = plot_rows, byrow = TRUE)#
-layout(plot_layout)#
-#
-# plot histograms of the frequency of proportions sampled for each taxon.#
-for (i in 1:ncol(plot_input)){#
-  hist(plot_input[, i], main = taxon_names[i], xlab = "proportion")#
-  abline(v = DNA_alpha_prop[i], col = "red")#
-}
-N_tax
-rexp(N_tax, rate = 1)
-rexp(N_tax, rate = 2)
-plot(sort(rexp(N_tax, rate = 2)))
-par(mfrow = c(3,3))
-for(i in 1:9){#
-	plot(sort(rexp(20, rate = i)))#
-}
-for(i in 1:9){#
-	plot(sort(rexp(n = 20, rate = i/10)))#
-}
-for(i in 1:9){#
-	plot(sort(rexp(n = 20, rate = i)))#
-}
-for(i in 1:9){#
-	plot(sort(rexp(n = 20, rate = i)), main = paste("rate = ", i, sep = ""))#
-}
-for(i in 1:9){#
-	plot(sort(rexp(n = 100, rate = i)), main = paste("rate = ", i, sep = ""))#
-}
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rexp(#
-				n = 100, #
-				rate = i#
-				)#
-			)#
-		, #
-		main = paste("rate = ", i, sep = ""), #
-		ylim = c(0,5)#
+    title(main = main.title, pch = 16)
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
+map.axes()
+library(Geneland)#
+library(mapdata)
+coordinates_obj <- read.table("/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/AMAK_eparses/geneland_AMAK/input/coordinates.txt")
+coordinates <- coordinates_obj
+mcmc_dir <- "/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/AMAK_eparses/geneland_AMAK/geneland_out/1/"
+mcmc_dir <- "/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/DATR_eparses/geneland_DATR/geneland_out/"
+mcmc_dir <- "/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/AMAK_eparses/geneland_AMAK/geneland_out/1/"
+gg_color_hue <- function(n) {#
+  hues = seq(15, 375, length=n+1)#
+  hcl(h=hues, l=65, c=100)[1:n]#
 }
-dpareto <- function(x, xm, alpha) ifelse(x > xm , alpha*xm**alpha/(x**(alpha+1)), 0)#
-ppareto <- function(q, xm, alpha) ifelse(q > xm , 1 - (xm/q)**alpha, 0 )#
-qpareto <- function(p, xm, alpha) ifelse(p < 0 | p > 1, NaN, xm*(1-p)**(-1/alpha))#
-rpareto <- function(n, xm, alpha) qpareto(runif(n), xm, alpha)#
+plot_geneland <- function (coordinates, path.mcmc, plotit = TRUE, format = "pdf", #
+          new.dev = TRUE, printit = FALSE, file, main.title = ""){#
+  coordinates <- as.matrix(coordinates)#
+  fileparam <- paste(path.mcmc, "parameters.txt", sep = "")#
+  # change:  fileparam <- file.path(path.mcmc, "parameters.txt")#
 #
-# The following function computes the MLE of the parameters#
-pareto.mle <- function(x)#
-{#
-  xm <- min(x)#
-  alpha <- length(x)/(sum(log(x))-length(x)*log(xm))#
-  return( list(xm = xm, alpha = alpha))#
-}#
-# Compute Kolmogorov-Smirnov statistic, using parametric bootstrap to estimate the p-value.#
-pareto.test <- function(x, B = 1e3)#
-{#
-  a <- pareto.mle(x)#
+  param <- as.matrix(read.table(fileparam))#
+  # change: param <- read.table(fileparam, sep = ":")#
+  delta.coord <- as.numeric(param[param[, 1] == "delta.coord", 3])#
+  # change: delta.coord <- as.numeric(param[param[, 1] == "delta.coord", 2])#
+  npopmax <- as.numeric(param[param[, 1] == "npopmax", 3])#
+  # change: npopmax <- as.numeric(param[param[, 1] == "npopmax", 2])#
+  param.postprocess <- as.matrix(read.table(paste(path.mcmc, "postprocess.parameters.txt", sep = "")))#
+  # change: param.postprocess <- read.table(file.path(path.mcmc, "postprocess.parameters.txt"), sep = ":")#
+  nxdom <- as.numeric(param.postprocess[1, 3])#
+  # change: nxdom <- as.numeric(param.postprocess[param.postprocess[, 1] == "nxdom", 3])#
+  nydom <- as.numeric(param.postprocess[2, 3])#
+  # change: nydom <- as.numeric(param.postprocess[param.postprocess[, 1] == "nydom", 3])#
+  print(nxdom)#
+  # print(paste("Number of horizontal pixels:", nxdom))#
+  print(nydom)#
+  # print(paste("Number of vertical pixels:", nydom))#
+  s <- coordinates#
+  filedom <- paste(path.mcmc, "proba.pop.membership.txt", sep = "")#
+  # filedom <- file.path(path.mcmc, "proba.pop.membership.txt")#
+  data <- as.matrix(read.table(filedom))#
+  # change: data to prob_pop_mem#
+  dom.post <- data[, -(1:2)]#
+  coord.grid <- data[, (1:2)]#
+  s[, 1] <- s[, 1] - min(s[, 1])#
+  s[, 2] <- s[, 2] - min(s[, 2])#
+  map.dom <- t(apply(dom.post, 1, order))[, npopmax]#
+  frame <- max(#
+    			max(coordinates[, 1]) - min(coordinates[, 1]), #
+    			max(coordinates[, 2]) - min(coordinates[, 2])#
+    			)/40#
 #
-  # KS statistic#
-  D <- ks.test(x, function(q) ppareto(q, a$xm, a$alpha))$statistic#
+  image(#
+    		x = seq(#
+    				from = min(coordinates[, 1] - delta.coord/2), #
+    				to   = max(coordinates[, 1] + delta.coord/2), #
+    				length = nxdom#
+    				), #
+    		y = seq(#
+    				from = min(coordinates[, 2] - delta.coord/2), #
+    				to   = max(coordinates[, 2] + delta.coord/2), #
+                    length = nydom#
+                    ), #
+			z = matrix(#
+					data = map.dom, #
+					nrow = nxdom, #
+					ncol = nydom,#
+					byrow = TRUE#
+					), #
+			xlab = "", #
+			ylab = "", #
+			main = "", #
+			cex = 1.5, #
+			cex.lab = 1.5, #
+			col = gg_color_hue(max(map.dom)),#terrain.colors(npopmax), #
+			xlim = c(min(coordinates[,1] - delta.coord/2 - frame), max(coordinates[,1] + delta.coord/2 + frame)), #
+			ylim = c(min(coordinates[,2] - delta.coord/2 - frame), max(coordinates[,2] + delta.coord/2 + frame)), #
+			asp = 1#
+		)#
 #
-  # estimating p value with parametric bootstrap#
-  B <- 1e5#
-  n <- length(x)#
-  emp.D <- numeric(B)#
-  for(b in 1:B)#
-  {#
-    xx <- rpareto(n, a$xm, a$alpha);#
-    aa <- pareto.mle(xx)#
-    emp.D[b] <- ks.test(xx, function(q) ppareto(q, aa$xm, aa$alpha))$statistic#
-  }#
+    points(#
+    			x = coordinates, #
+    			pch = 8, #16#
+    			cex = 1#
+    			)#
 #
-  return(list(xm = a$xm, alpha = a$alpha, D = D, p = sum(emp.D > D)/B))#
-}#
-# Example usage:#
-# values from a Pareto distribution...#
-x <- rpareto(100, 0.5, 2)#
-pareto.test(x)
-pareto.test(x)
-x <- rchisq(100, df=2)
-pareto.test(x)
-my_number <- 4#
-par_scale <- 1 # scale parameter "my_number sub m" aka "xm" -- the minimum possible value of random_variable#
-par_shape <- 3 # shape parameter "alpha"
-Prob_rand_gt_my <- if(my_number >= par_scale){#
-						(par_scale/my_number)^par_shape#
-					} else { 1 }
-Prob_rand_gt_my
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rexp(#
-				n = 100, #
-				rate = i#
-				)#
-			)#
-		, #
-		main = paste("rate = ", i, sep = ""), #
-		ylim = c(0,5), #
-		pch = 20#
-	)#
-}
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rexp(#
-				n = 100, #
-				rate = i#
-				)#
-			)#
-		, #
-		main = paste("rate = ", i, sep = ""), #
-		ylim = c(0,5), #
-		pch = 20, #
-		cex = 0.5#
-	)#
-}
-rexp(5, 1)
-rexp(5, 2)
-rexp(5, 3)
-rexp(5, 4)
-rexp(5, 10)
-rexp(5, 0.1)
-seq(0.1, 0.9, by = 0.1)
-for(i in seq(0.1, 0.9, by = 0.1)){#
-	plot(#
-		sort(#
-			rexp(#
-				n = 100, #
-				rate = i#
-				)#
-			)#
-		, #
-		main = paste("rate = ", i, sep = ""), #
-		ylim = c(0,5), #
-		pch = 20, #
-		cex = 0.5#
-	)#
-}
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rexp(#
-				n = 100, #
-				rate = i#
-				)#
-			)#
-		, #
-		main = paste("rate = ", i, sep = ""), #
-		ylim = c(0,5), #
-		pch = 20, #
-		cex = 0.5#
-	)#
-}
-par(mfrow = c(3,3))
-rpareto(9, 1, 1)
-par(mfrow = c(3,3))
-plot(sort(rpareto(9, 1, 1)))
-plot(sort(rpareto(20, 1, 1)))
-replicate(10, sapply(rpareto(100, 1, 1), FUN = max))
-rpareto(100, 1, 1)
-replicate(10, max(rpareto(100, 1, 1))
+    # title(sub = "Estimated cluster membership")#
+#
+    title(main = main.title, pch = 16)#
+#
+  }
+plot_geneland(coordinates = coordinates, path.mcmc = path.mcmc)
+plot_geneland <- function (coordinates, path.mcmc, main.title = ""){#
+  coordinates <- as.matrix(coordinates)#
+  fileparam <- paste(path.mcmc, "parameters.txt", sep = "")#
+  # change:  fileparam <- file.path(path.mcmc, "parameters.txt")#
+#
+  param <- as.matrix(read.table(fileparam))#
+  # change: param <- read.table(fileparam, sep = ":")#
+  delta.coord <- as.numeric(param[param[, 1] == "delta.coord", 3])#
+  # change: delta.coord <- as.numeric(param[param[, 1] == "delta.coord", 2])#
+  npopmax <- as.numeric(param[param[, 1] == "npopmax", 3])#
+  # change: npopmax <- as.numeric(param[param[, 1] == "npopmax", 2])#
+  param.postprocess <- as.matrix(read.table(paste(path.mcmc, "postprocess.parameters.txt", sep = "")))#
+  # change: param.postprocess <- read.table(file.path(path.mcmc, "postprocess.parameters.txt"), sep = ":")#
+  nxdom <- as.numeric(param.postprocess[1, 3])#
+  # change: nxdom <- as.numeric(param.postprocess[param.postprocess[, 1] == "nxdom", 3])#
+  nydom <- as.numeric(param.postprocess[2, 3])#
+  # change: nydom <- as.numeric(param.postprocess[param.postprocess[, 1] == "nydom", 3])#
+  print(nxdom)#
+  # print(paste("Number of horizontal pixels:", nxdom))#
+  print(nydom)#
+  # print(paste("Number of vertical pixels:", nydom))#
+  s <- coordinates#
+  filedom <- paste(path.mcmc, "proba.pop.membership.txt", sep = "")#
+  # filedom <- file.path(path.mcmc, "proba.pop.membership.txt")#
+  data <- as.matrix(read.table(filedom))#
+  # change: data to prob_pop_mem#
+  dom.post <- data[, -(1:2)]#
+  coord.grid <- data[, (1:2)]#
+  s[, 1] <- s[, 1] - min(s[, 1])#
+  s[, 2] <- s[, 2] - min(s[, 2])#
+  map.dom <- t(apply(dom.post, 1, order))[, npopmax]#
+  frame <- max(#
+    			max(coordinates[, 1]) - min(coordinates[, 1]), #
+    			max(coordinates[, 2]) - min(coordinates[, 2])#
+    			)/40#
+#
+  image(#
+    		x = seq(#
+    				from = min(coordinates[, 1] - delta.coord/2), #
+    				to   = max(coordinates[, 1] + delta.coord/2), #
+    				length = nxdom#
+    				), #
+    		y = seq(#
+    				from = min(coordinates[, 2] - delta.coord/2), #
+    				to   = max(coordinates[, 2] + delta.coord/2), #
+                    length = nydom#
+                    ), #
+			z = matrix(#
+					data = map.dom, #
+					nrow = nxdom, #
+					ncol = nydom,#
+					byrow = TRUE#
+					), #
+			xlab = "", #
+			ylab = "", #
+			main = "", #
+			cex = 1.5, #
+			cex.lab = 1.5, #
+			col = gg_color_hue(max(map.dom)),#terrain.colors(npopmax), #
+			xlim = c(min(coordinates[,1] - delta.coord/2 - frame), max(coordinates[,1] + delta.coord/2 + frame)), #
+			ylim = c(min(coordinates[,2] - delta.coord/2 - frame), max(coordinates[,2] + delta.coord/2 + frame)), #
+			asp = 1#
+		)#
+#
+    points(#
+    			x = coordinates, #
+    			pch = 8, #16#
+    			cex = 1#
+    			)#
+#
+    # title(sub = "Estimated cluster membership")#
+#
+    title(main = main.title, pch = 16)#
+#
+  }
+mcmc_dir
+plot_geneland(coordinates = coordinates_obj)
+plot_geneland(coordinates = coordinates_obj, path.mcmc = mcmc_dir)
+par(mfcol=c(1,2))#
+plot_geneland(#
+	coordinates = coordinates_obj, #
+	path.mcmc = mcmc_dir#
 )
-replicate(10, max(rpareto(100, 1, 1)))
-plot(replicate(10, max(rpareto(100, 1, 1))))
-plot(max(replicate(10, rpareto(100, 1, 1))))
-max(replicate(10, rpareto(100, 1, 1)))
-plot(sapply(replicate(10, rpareto(100, 1, 1)), max))
-rpareto(100, 1, 1)
-replicate(10, rpareto(100, 1, 1)
+plot_geneland(#
+	coordinates = coordinates_obj, #
+	path.mcmc = mcmc_dir#
 )
-plot(sapply(replicate(10, rpareto(100, 1, 1)), max))
-plot(sort(rpareto(20, 1, 1)))
-plot(sort(rpareto(100, 1, 1)))
-plot(sort(rpareto(100, 2, 1)))
-plot(sort(rpareto(100, 3, 1)))
-plot(sort(rpareto(100, 4, 1)))
-plot(sort(rpareto(100, 5, 1)))
-plot(sort(rpareto(100, 1, 1)))
-plot(sort(rpareto(100, 1, 2)))
-plot(sort(rpareto(100, 1, 3)))
-plot(sort(rpareto(100, 1, 4)))
-plot(sort(rpareto(100, 1, 5)))
-plot(sort(rpareto(100, 1, 6)))
-plot(sort(rpareto(100, 1, 2)))
-plot(sort(rpareto(100, 1, 3)))
-plot(sort(rpareto(100, 1, 4)))
-plot(sort(rpareto(100, 1, 4)), ylim = c(0, 15))
-plot(sort(rpareto(100, 1, 3)), ylim = c(0, 15))
-plot(sort(rpareto(100, 1, 2)), ylim = c(0, 15))
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rpareto(#
-				100, i, 2#
-			)#
-		)#
-		, ylim = c(0, 15)#
+coordinates_obj
+min(coordinates_obj[,1])
+min(coordinates_obj[,2])
+max(coordinates_obj[,1])
+max(coordinates_obj[,2])
+plot_geneland(#
+	coordinates = coordinates_obj, #
+	path.mcmc = mcmc_dir#
+)
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+map.axes()
+layout_matrix <- matrix(data = c(1,2), nrow = 1)#
+layout(mat = layout_matrix)#
+layout.show()
+layout_matrix
+layout(mat = layout_matrix)
+layout.show()
+coordinates_AMAK <- read.table("/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/AMAK_eparses/geneland_AMAK/input/coordinates.txt")
+coordinates_DATR <- read.table("/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/DATR_eparses/geneland_DATR/input/coordinates.txt")
+coordinates_AMAK <- read.table("/Users/jimmy.odonnell/Downloads/geneland_AMAK/input/coordinates.txt")
+coordinates_AMAK <- read.table("/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/AMAK_eparses/geneland_AMAK/input/coordinates.txt")
+coordinates_DATR <- read.table("/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/DATR_eparses/geneland_DATR/input/coordinates.txt")
+coordinates_AMAK <- read.table("/Users/jimmy.odonnell/Downloads/geneland_AMAK/input/coordinates.txt")
+coordinates_AMAK
+coordinates_AMAK <- read.table("/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/AMAK_eparses/geneland_AMAK/input/coordinates.txt")
+mcmc_dir_AMAK <- "/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/AMAK_eparses/geneland_AMAK/geneland_out/1/"
+mcmc_dir_DATR <- "/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/DATR_eparses/geneland_DATR/geneland_out/"
+par(mfcol=c(1,2))#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir#
+)#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
-}
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rpareto(#
-				100, 1, i#
-			)#
-		)#
-		, ylim = c(0, 15)#
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR#
+)#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+par(mfcol=c(1,2))#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK#
+)#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR#
+)
+coordinates_DATR <- read.table("/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/DATR_eparses/geneland_DATR/input/coordinates.txt")
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR#
+)
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+mcmc_dir_DATR <- "/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/DATR_eparses/geneland_DATR/output_2015-10-14_130412/"
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR#
+)
+mcmc_dir_DATR <- "/Users/threeprime/Dropbox/Eparses_Connectivity/Analysis/DATR_eparses/geneland_DATR/output_2015-10-21_123923/"
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR#
+)
+par(mfcol=c(1,2))#
+#
+# plot the first species#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
-}#
-# as alpha increases, maximum value drawn tends to decrease
-runif(N_tax,1,100)
-round(runif(N_tax,1,100))
-counts_vec
-counts_mat
-barplot(counts_mat)
-barplot(prop_true_small)
-prop_true_small
-barplot(t(prop_true_small))
-barplot(counts_mat)
-barplot(t(prop_true_small))
-colsums(counts_mat)
-colSums(counts_mat)
-prop_true_small*1e5
-counts_mat
-t(counts_mat)
-t(counts_mat)/rowSums(counts_mat)
-ks.test(t(counts_mat)/rowSums(counts_mat), prop_true_small)
-ks.test((counts_mat)/rowSums(counts_mat), prop_true_small)
-counts_mat
-t(counts_mat)/rowSums(t(counts_mat))
-rowSums(t(counts_mat)/rowSums(t(counts_mat)))
-rowSums(prop_true_small)
-ks.test(t(counts_mat)/rowSums(t(counts_mat)), prop_true_small)
-prop_true_small
-counts_vec
-counts_mat
-counts
-names(counts_mat) <- taxon_names
-counts_mat
-set.seed(407744)#
-counts_mat <- apply(#
-					X = eDNA_counts_small, #
-					MARGIN = 1, #
-					FUN = function(x) #
-						rmultinom(size = N_draws, prob = x, n = 1)#
-				)
-#############################################################################
-# This script simulates some data that resembles eDNA sequence data#
-#############################################################################
 #
-# Original code by Ole Shelton#
-# Hacked up by Jimmy O'Donnell#
-# Comments mostly reflect Jimmy's imperfect understanding of the underlying concepts.#
+# plot the second species#
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR#
+)#
 #
-library(gtools) # gtools::rdirichlet#
-library(R2jags) # R2jags::jags#
-# Suppose we have an aquarium which contains N_tax taxa#
-N_tax <- 9#
-# Give them names#
-taxon_names <- paste("taxon_", LETTERS[1:N_tax], sep = "")#
-# The distribution of DNA molecules derived from each of the taxa might look like the following#
-# Ole originally called these alpha because they eventually become the alpha parameter of the Dirichlet distribution, which sorta determines how likely each component is to be drawn#
-# I call these "true" because they represent the "true" abundance of DNA from each taxon in the sample.#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-# Instead of runif, you might try using rexp or random from the Pareto distribution to more accurately resemble "real" eDNA results#
-set.seed(407744)#
-DNA_truth		<- sort(round(runif(N_tax,1,100)), decreasing = TRUE)#
-names(DNA_truth) <- taxon_names#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+pdf(file = "geneland_both_species.pdf", width = 10, height = 5)#
+# Set up plot for two plots#
+par(mfcol=c(1,2))#
 #
-# those same values expressed as proportions#
-DNA_truth_prop <- DNA_truth/sum(DNA_truth)#
-#############################################################################
-# The actual simulation #
-#############################################################################
+# plot the first species#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK#
+)#
 #
-# This simulates data that might be expected from high throughput sequencing of PCR amplicons generated from environmental samples: proportional abundance of sequences from each of the taxa/OTUs/dups#
-# draw samples from the Dirichlet distribution, using alpha given by DNA_truth to approximate the sampling of DNA molecules from the environment#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-# How many times should we sample?#
-N_samples_small	<-	3#
-set.seed(407744)#
-eDNA_counts_small <- rdirichlet(N_samples_small, DNA_truth)#
-colnames(eDNA_counts_small) <- taxon_names#
-#############
-# OR...#
-#############
-N_samples_big		<- 100000#
-set.seed(407744)#
-eDNA_counts_big <- rdirichlet(N_samples_big, DNA_truth)#
-colnames(eDNA_counts_big) <- taxon_names#
-# Set whichever of these as the plot input:#
-plot_input <- eDNA_counts_big#
-#
-# Create plot layout (this looks complicated to allow it to be flexible to different taxa numbers)#
-plot_cols <- ceiling(sqrt(ncol(plot_input)))#
-plot_rows <- ceiling(ncol(plot_input)/plot_cols)#
-plot_layout <- matrix(data = 1:(plot_cols*plot_rows), nrow = plot_rows, byrow = TRUE)#
-layout(plot_layout)#
-#
-# plot histograms of the frequency of proportions sampled for each taxon.#
-for (i in 1:ncol(plot_input)){#
-  hist(plot_input[, i], main = taxon_names[i], xlab = "proportion")#
-  abline(v = DNA_truth_prop[i], col = "red")#
-}#
-# In a similar way, we can use each of the samples to inform the probabilities of draws from a multinomial distribution. This produces data that is functionally indistinguishable from that presented above.#
-# Using each row of the "true proportion" data frame as probabilities...#
-# essentially: take a draw of 'N_draws' marbles, #
-# and put them into each of some number of bins #
-# with probability of going into each bin given by the "true proportion" row#
-# (repeat n times)#
-#
-N_draws		<-	100000#
-#
-set.seed(407744)#
-counts_mat <- apply(#
-					X = eDNA_counts_small, #
-					MARGIN = 1, #
-					FUN = function(x) #
-						rmultinom(size = N_draws, prob = x, n = 1)#
-				)
-counts_mat
-rownames(counts_mat) <- taxon_names
-counts_mat
-counts <- t(counts_mat)
-counts
-counts_vec <- as.vector(counts)
-counts_vec
-names(counts_vec) <- rep(x = taxon_names, each = N_samples_small)
-counts_vec
-mydata <- counts
-mydata
-dput(mydata)
-counts <- mydata
-colnames(counts)
-names(counts_vec) <- rep(x = colnames(counts), each = nrow(counts))
-counts_vec
-nrow(counts)
-length(counts)
-length(counts_vec)
-library(gtools) # gtools::rdirichlet#
-library(R2jags) # R2jags::jags#
-# Suppose we have an aquarium which contains N_tax taxa#
-N_tax <- 9#
-# Give them names#
-taxon_names <- paste("taxon_", LETTERS[1:N_tax], sep = "")#
-# The distribution of DNA molecules derived from each of the taxa might look like the following#
-# Ole originally called these alpha because they eventually become the alpha parameter of the Dirichlet distribution, which sorta determines how likely each component is to be drawn#
-# I call these "true" because they represent the "true" abundance of DNA from each taxon in the sample.#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-# Instead of runif, you might try using rexp or random from the Pareto distribution to more accurately resemble "real" eDNA results#
-set.seed(407744)#
-DNA_truth		<- sort(round(runif(N_tax,1,100)), decreasing = TRUE)#
-names(DNA_truth) <- taxon_names#
-#
-# those same values expressed as proportions#
-DNA_truth_prop <- DNA_truth/sum(DNA_truth)#
-#############################################################################
-# The actual simulation #
-#############################################################################
-#
-# This simulates data that might be expected from high throughput sequencing of PCR amplicons generated from environmental samples: proportional abundance of sequences from each of the taxa/OTUs/dups#
-# draw samples from the Dirichlet distribution, using alpha given by DNA_truth to approximate the sampling of DNA molecules from the environment#
-# Set seed to be able to reproduce draws from a probability distribution (gets reset each time one of these functions is used)#
-# How many times should we sample?#
-N_samples_small	<-	3#
-set.seed(407744)#
-eDNA_counts_small <- rdirichlet(N_samples_small, DNA_truth)#
-colnames(eDNA_counts_small) <- taxon_names#
-#############
-# OR...#
-#############
-N_samples_big		<- 100000#
-set.seed(407744)#
-eDNA_counts_big <- rdirichlet(N_samples_big, DNA_truth)#
-colnames(eDNA_counts_big) <- taxon_names#
-# Set whichever of these as the plot input:#
-plot_input <- eDNA_counts_big#
-#
-# Create plot layout (this looks complicated to allow it to be flexible to different taxa numbers)#
-plot_cols <- ceiling(sqrt(ncol(plot_input)))#
-plot_rows <- ceiling(ncol(plot_input)/plot_cols)#
-plot_layout <- matrix(data = 1:(plot_cols*plot_rows), nrow = plot_rows, byrow = TRUE)#
-layout(plot_layout)#
-#
-# plot histograms of the frequency of proportions sampled for each taxon.#
-for (i in 1:ncol(plot_input)){#
-  hist(plot_input[, i], main = taxon_names[i], xlab = "proportion")#
-  abline(v = DNA_truth_prop[i], col = "red")#
-}#
-# In a similar way, we can use each of the samples to inform the probabilities of draws from a multinomial distribution. This produces data that is functionally indistinguishable from that presented above.#
-# Using each row of the "true proportion" data frame as probabilities...#
-# essentially: take a draw of 'N_draws' marbles, #
-# and put them into each of some number of bins #
-# with probability of going into each bin given by the "true proportion" row#
-# (repeat n times)#
-#
-N_draws		<-	100000#
-#
-set.seed(407744)#
-counts_mat <- apply(#
-					X = eDNA_counts_small, #
-					MARGIN = 1, #
-					FUN = function(x) #
-						rmultinom(size = N_draws, prob = x, n = 1)#
-				)#
-#
-# assign names#
-rownames(counts_mat) <- taxon_names#
-#
-# transpose#
-counts <- t(counts_mat)#
-#
-mydata <- counts
-counts <- mydata#
-#
-# make into a vector#
-counts_vec <- as.vector(counts)#
-names(counts_vec) <- rep(x = colnames(counts), each = nrow(counts))#
-# want to save the file?
-write.csv(x = counts, file = "counts.csv")
-write.csv(x = counts, file = "counts.csv", row.names = FALSE)
-write.csv(x = counts, file = "counts.csv", row.names = FALSE, quotes = FALSE)
-write.csv(x = counts, file = "counts.csv", row.names = FALSE, quote = FALSE)
-counts <- mydata
-counts_vec <- as.vector(counts)#
-names(counts_vec) <- rep(x = colnames(counts), each = nrow(counts))
-as.matrix(mydata)
-identical(counts, as.matrix(mydata))
-mydata <- as.matrix(read.csv("counts.csv"))
-identical(mydata, counts)
-par(mfrow = c(3,3))#
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rexp(#
-				n = 100, #
-				rate = i#
-				)#
-			)#
-		, #
-		main = paste("rate = ", i, sep = ""), #
-		ylim = c(0,5), #
-		pch = 20, #
-		cex = 0.5#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
-}
-dpareto <- function(x, xm, alpha) ifelse(x > xm , alpha*xm**alpha/(x**(alpha+1)), 0)#
-ppareto <- function(q, xm, alpha) ifelse(q > xm , 1 - (xm/q)**alpha, 0 )#
-qpareto <- function(p, xm, alpha) ifelse(p < 0 | p > 1, NaN, xm*(1-p)**(-1/alpha))#
-rpareto <- function(n, xm, alpha) qpareto(runif(n), xm, alpha)#
 #
-par(mfrow = c(3,3))#
+# plot the second species#
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR#
+)#
 #
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rpareto(#
-				100, i, 2#
-			)#
-		)#
-		, ylim = c(0, 15)#
-	)#
-}#
-# xm simply determines the minimum value drawn#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+dev.off()
+postscript(file = "geneland_both_species.ps", width = 10, height = 5)
+par(mfcol=c(1,2))#
 #
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rpareto(#
-				100, 1, i#
-			)#
-		)#
-		, ylim = c(0, 15)#
+# plot the first species#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
-}
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rpareto(#
-				100, i, 2#
-			)#
-		)#
-		, ylim = c(0, 15)#
+#
+# plot the second species#
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
-}
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rpareto(#
-				100, i, 2#
-			)#
-		)#
-		, ylim = c(0, 15), #
-		main = paste("xm = ", i, sep = "")#
+#
+dev.off()
+par(mfcol=c(1,2))#
+#
+# plot the first species#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+title(main = "Amphiprion akallopisos")
+title(main = italic("Amphiprion akallopisos"))
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
-}
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rpareto(#
-				n = 100, xm = 1, alpha = i#
-			)#
-		)#
-		, ylim = c(0, 15), #
-		main = paste("alph = ", i, sep = "")#
+title(main = italic("Amphiprion akallopisos"))
+title(main = italics("Amphiprion akallopisos"))
+par(mfcol=c(1,2))
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK, #
+	main.title = "Amphiprion akallopisos"#
+)
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK, #
+	main.title = italics("Amphiprion akallopisos")#
+)
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK, #
+	main.title = italic("Amphiprion akallopisos")#
+)
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK, #
+	main.title = expression(italic("Amphiprion akallopisos"))#
+)
+par(mfcol=c(1,2))#
+#
+# plot the first species#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK, #
+	main.title = expression(italic("Amphiprion akallopisos"))#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
-}
-for(i in 1:9){#
-	plot(#
-		sort(#
-			rpareto(#
-				n = 100, xm = 1, alpha = i#
-			)#
-		)#
-		, ylim = c(0, 15), #
-		main = paste("alpha = ", i, sep = "")#
+title(main = italics("Amphiprion akallopisos"))#
+#
+# plot the second species#
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR, #
+	main.title = expression(italic("Amphiprion akallopisos"))#
+#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+par(mfcol=c(1,2))#
+#
+# plot the first species#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK, #
+	main.title = expression(italic("Amphiprion akallopisos"))#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
 	)#
-}
-#(April 23 2014).#
-netcascade <- function(imatrix,ranim,rplants,deadPlants=NULL, deadAnimals=NULL, targetGuild,target,return.matrix=F){#
-  #---------ARGUMENT CHECKS-----------------------------------#
-  if(class(imatrix)!="matrix" || (nrow(imatrix)+ncol(imatrix))<3){stop("'imatrix' must be an object of class 'matrix', with animal species on rows, plant species on columns and at least three species overall")}#
-  if(class(ranim)!="numeric" || class(rplants) != "numeric" || max(c(max(ranim),max(rplants)))>1 || min(c(min(ranim),min(rplants)))<0){stop("'ranim' & 'rplants' must be numeric vectors with values ranging between 0 and 1")}#
-  if((targetGuild%in%c("animal","plant"))==F){stop('Invalid target guild for primary extinction. Valid targets guilds are "animal" and "plant"')}#
-  if(is.numeric(target)==F){stop('Invalid value for the "target" argument. You may specify a single species by entering its row or column number or you may use a vector of relative probabilites for all species in the target guild.')}#
-  if(is.null(deadAnimals)==F && class(deadAnimals)!= "integer"){stop("deadAnimals must be either NULL or an integer vector specifying the row numbers of animals considered to be extinct on the original matrix")}#
-  if(is.null(deadPlants)==F && class(deadPlants)!= "integer"){stop("deadPlants must be either NULL an integer vector specifying the column numbers of plants considered to be extinct on the original matrix")}#
-  if(length(ranim)!= nrow(imatrix)){stop("The length of vector'ranim' must be equal to number of rows (i.e. animal species) in 'imatrix'")}#
-  if(length(rplants)!= ncol(imatrix)){stop("The length of vector'rplants' must be equal to number of columns (i.e. plant species) in 'imatrix'")}#
-  #---------DEFINING SOME VARIABLES---------------------------#
-  nanim <- nrow(imatrix)#
-  npla <- ncol(imatrix)#
-  plants <- 1:npla;#
-  animals <- 1:nanim#
-  plantNA <- 1:npla#
-  animNA <- 1:nanim#
-  plantNA[deadPlants] <- NA#
-  animNA[deadAnimals] <- NA #
-  degree_when_lost_plants <- c()#
-  degree_when_lost_animals <- c()#
-  #----------CALCULATING DEPENDENCE MATRICES-------------------#
-  M <- array(0,dim=c(nanim,npla,2))#
-  for(i in 1:npla){#
-    M[,i,1] <- imatrix[,i]/sum(imatrix[,i])#
-  } #matrix of plant dependence on each animal#
-  for(i in 1:nanim){#
-    M[i,,2] <- imatrix[i,]/sum(imatrix[i,])#
-  } #matrix of animal dependence on each plant#
-  #-----------CHOOSING TARGET SPECIES FOR PRIMARY EXTINCTION---#
-  coext_animals <- c()#
-  coext_plants <- c()#
-  if(length(target)==1){#
-    if(targetGuild=="animal"){#
-      if(target %in% deadAnimals){stop('Specified target species for the primary extinction is already extinct')}#
-      coext_animals <- target#
-      degree_when_lost_animals <- 1 #stores the degree of the extinction event of every animal species lost during the coextinction cascade. #
-    }#
-    if(targetGuild=="plant"){#
-      if(target %in% deadPlants){stop('Specified target species for the primary extinction is already extinct')}#
-      coext_plants <- target#
-      degree_when_lost_plants <- 1#
-    }#
-  }else{#
-    nspecies <- switch(targetGuild,animal = nanim, plant = npla)#
-    if(length(target)==nspecies){#
-      if(targetGuild =="animal"){#
-        alive <- animals[is.na(animNA)==F]#
-        coext_animals <- sample(c(alive,0),1,prob = c(target[is.na(animNA)==F],0))#
-        degree_when_lost_animals <- 1#
-      }#
-      if(targetGuild =="plant"){#
-        alive <- plants[is.na(plantNA)==F]#
-        coext_plants <- sample(c(alive,0),1,prob = c(target[is.na(plantNA)==F],0))#
-        degree_when_lost_plants <- 1#
-      }#
-    }else{#
-      stop('Length of "target" must be 1 (specifying a single species within the target guild) or else be equal to the number of species in the target guild (specifying probabilities of primary extinction for each species in the target guild)')#
-    }#
-  }#
-  imatrix[coext_animals,] <- 0 #
-  imatrix[,coext_plants] <- 0#
-  lostanimals <- coext_animals #final list of animals which were "alive" in the original community but became extinct during this primary extinction + extinction cascade#
-  lostplants <- coext_plants #
-  #-------------------CASCADE LOOP---------------------------#
-  equilibrium <- FALSE#
-  degree <- 1#
-  degree_table <- data.frame(degree,guild=factor(targetGuild,levels=c("animal","plant")),n_extinctions=1)#
-  while(equilibrium == FALSE){#
-    ext_animals <- coext_animals#
-    ext_plants <- coext_plants#
-    plantNA[ext_plants] <- NA#
-    animNA[ext_animals] <- NA#
-    aleft <- animals[is.na(animNA)==F]#
-    pleft <- plants[is.na(plantNA)==F]#
-    if(length(ext_animals)>0){#
-      for(i in 1:length(ext_animals)){#
-        unlucky <- rplants[pleft]*M[ext_animals[i],pleft,1] > runif(length(pleft))#
-        coext_plants = c(coext_plants,pleft[unlucky])#
-      }#
-      coext_animals <- c()#
-      coext_plants <- unique(coext_plants)#
-      plantNA[coext_plants] <- NA#
-      lostplants <- c(lostplants,coext_plants)#
-      imatrix[,coext_plants] <- 0#
-      for(i in 1:npla){#
-        if(sum(imatrix[,i])==0){#
-          M[,i,1] <- 0#
-        }else{#
-          M[,i,1] <- imatrix[,i]/sum(imatrix[,i])#
-        }#
-      }#
-      if(length(coext_plants)>0){#
-        degree <- degree + 1#
-        degree_when_lost_plants <- c(degree_when_lost_plants, rep(degree,length(coext_plants)))#
-        degree_table[degree,] <- data.frame(degree,"plant",length(coext_plants))#
-      }#
-    }else{#
-      for(i in 1:length(ext_plants)){#
-        unlucky <- ranim[aleft]*M[aleft,ext_plants[i],2] > runif(length(aleft))#
-        coext_animals <- c(coext_animals, aleft[unlucky])#
-      }#
-      coext_plants = c();#
-      coext_animals <- unique(coext_animals)#
-      lostanimals <- c(lostanimals,coext_animals)#
-      animNA[coext_animals] <- NA#
-      imatrix[coext_animals,] <- 0#
-      for(i in 1:nanim){#
-        if(sum(imatrix[i,])==0){#
-          M[i,,2] <- 0#
-        }else{#
-          M[i,,2] <- imatrix[i,]/sum(imatrix[i,])#
-        }#
-      }#
-      if(length(coext_animals)>0){#
-        degree <- degree + 1#
-        degree_when_lost_animals <- c(degree_when_lost_animals, rep(degree,length(coext_animals)))#
-        degree_table[degree,] <- data.frame(degree,"animal",length(coext_animals))  #
-      }#
-    }#
-    equilibrium <- equilibrium + (length(coext_plants)+length(coext_animals))==0#
+title(main = italics("Amphiprion akallopisos"))#
+#
+# plot the second species#
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR, #
+	main.title = expression(italic("Dascyllus trimaculatus"))#
+#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)#
+#
+dev.off()
+par(mfcol=c(1,2))#
+#
+# plot the first species#
+plot_geneland(#
+	coordinates = coordinates_AMAK, #
+	path.mcmc = mcmc_dir_AMAK, #
+	main.title = expression(italic("Amphiprion akallopisos"))#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)#
+title(main = italics("Amphiprion akallopisos"))#
+#
+# plot the second species#
+plot_geneland(#
+	coordinates = coordinates_DATR, #
+	path.mcmc = mcmc_dir_DATR, #
+	main.title = expression(italic("Dascyllus trimaculatus"))#
+#
+)#
+#
+# overlay the map#
+map(#
+	database ='world2Hires', #
+	xlim = c(30, 55), #
+	ylim = c(-26, -4), #
+	fill=TRUE, #
+	col="gray", #
+	boundary="gray", #
+	interior="gray", #
+	add=TRUE, #
+	mar=c(4,4,0,4)#
+	)
+library(maps)#
+map("state", interior = FALSE)#
+map("state", boundary = FALSE, col="gray", add = TRUE)
+library(maps)#
+map("state", interior = FALSE)#
+map("state", boundary = FALSE, col="gray", add = TRUE, fill = 2)
+library(maps)
+map("state", boundary = FALSE, col="gray", add = TRUE, fill = 2)
+library(maps)
+map("state", boundary = FALSE, col="gray", add = TRUE, fill = 2)
+library(maps)#
+map("state", interior = FALSE)#
+map("state", boundary = FALSE, col="gray", add = TRUE, fill = 2)
+library(maps)
+library(maps)#
+map("state", interior = TRUE)#
+map("state", boundary = FALSE, col="gray", add = TRUE, fill = 2)
+dat
+dat <- read.csv("/Users/threeprime/Documents/GoogleDrive/Kelly_Lab/Projects/PS_urban_eDNA/Data/Analysis_20151125_1623/all_lib/OTUs_swarm/OTUs_BayesianVetted_decontam_rarefied.csv")
+rowSums(dat)
+dat[1:5,1:5]
+dat <- read.csv("/Users/threeprime/Documents/GoogleDrive/Kelly_Lab/Projects/PS_urban_eDNA/Data/Analysis_20151125_1623/all_lib/OTUs_swarm/OTUs_BayesianVetted_decontam_rarefied.csv", row.names = 1)
+dat[1:5,1:5]
+rowSums(dat)
+plot(rowSums(dat))
+plot(sort(rowSums(dat)))
+plot(sort(rowSums(dat), decreasing = TRUE))
+which( sort(rowSums(dat), decreasing = TRUE) == 0)
+which( sort(rowSums(dat), decreasing = TRUE) )
+sort(rowSums(dat), decreasing = TRUE)
+plot(log(sort(rowSums(dat), decreasing = TRUE)))
+abline(h = 0)
+abline(h = 1)
+abline(h = 3, log = y)
+abline(h = 3, log = "y")
+plot(log(sort(rowSums(dat), decreasing = TRUE)))
+plot(sort(rowSums(dat), decreasing = TRUE), log = "y")
+plot(sort(rowSums(dat), decreasing = TRUE))
+plot(sort(rowSums(dat), decreasing = TRUE), log = "y")
+log(0)
+log(1)
+length(which(rowSums(dat) == 0))
+table(rowSums(dat))
+hist(rowSums(dat))
+?hist
+hist(rowSums(dat), breaks = 50)
+hist(rowSums(dat), breaks = 100)
+hist(rowSums(dat), breaks = 1000)
+table(rowSums(dat))
+hist(rowSums(dat), breaks = c(0, 10, 100, 1000, 10000))
+hist(rowSums(dat), breaks = c(0, 10, 100, 1000, 10000, max(rowSums(dat))))
+hist(rowSums(dat), breaks = c(0, 10, max(rowSums(dat))))
+table(rowSums(dat))
+plot(table(rowSums(dat)))
+plot(log(table(rowSums(dat))))
+plot(table(rowSums(dat)), log = "x")
+plot(sort(rowSums(dat), decreasing = TRUE))
+plot(sort(rowSums(dat), decreasing = TRUE), log = "y")
+plot(sort(rowSums(dat), decreasing = TRUE))
+plot(sort(rowSums(dat), decreasing = TRUE), log = "y")
+plot(sort(rowSums(dat), decreasing = TRUE), log = "y", ylab = "sum of reads across samples")
+plot(sort(rowSums(dat), decreasing = TRUE), log = "y", ylab = "log(total reads across samples)")
+text(nrow(data), max(rowSums(dat)), "stuff")
+max(rowSums(dat))
+nrow(data)
+nrow(dat)
+text(nrow(dat), max(rowSums(dat)), "stuff")
+abline(h = 1)
+abline(h = 10, lty = "2")
+abline(h = 10, lty = 2)
+plot(table(rowSums(dat)), log = "x")
+plot(sort(rowSums(dat), decreasing = TRUE))
+abline(h = 10, lty = 2)
+plot(#
+	sort(rowSums(dat), decreasing = TRUE), #
+	log = "y", #
+	ylab = "log(total reads across samples)"#
+	xlab = "OTU index"#
+	)#
+abline(h = 10, lty = 2)
+plot(
+sort(rowSums(dat), decreasing = TRUE), #
+	log = "y", #
+	ylab = "log(total reads across samples)", #
+	xlab = "OTU index"#
+	)
+abline(h = 10, lty = 2)
+text(nrow(dat), 11, "10")
+text(nrow(dat), 12, "10")
+text(nrow(dat), 13, "10")
+plot(#
+	sort(rowSums(dat), decreasing = TRUE), #
+	log = "y", #
+	ylab = "log(total reads across samples)", #
+	xlab = "OTU index"#
+	)#
+abline(h = 10, lty = 2)#
+#
+text(nrow(dat), 13, "10")
+length(which(rowSums(dat) == 0))
+length(which(rowSums(dat) > 10))
+length(which(rowSums(dat) > 10))/nrow(dat)
+nrow(dat)
+1812 -138
+length(which(rowSums(dat) == 0))
+no_counts <- length(which(rowSums(dat) == 0))
+text(nrow(dat), max(rowSums(dat)), paste(no_counts, "reads had no counts"))
+text(nrow(dat), max(rowSums(dat)), paste(no_counts, "reads had no counts"), pos = 2)
+plot(#
+	sort(rowSums(dat), decreasing = TRUE), #
+	log = "y", #
+	ylab = "log(total reads across samples)", #
+	xlab = "OTU index"#
+	)#
+abline(h = 10, lty = 2)#
+#
+text(nrow(dat), 13, "10")#
+# how many have no counts?#
+no_counts <- length(which(rowSums(dat) == 0))#
+text(nrow(dat), max(rowSums(dat)), paste(no_counts, "reads had no counts"), pos = 2)
+length(which(rowSums(dat) > 10))/nrow(dat)
+# another way of looking at data#
+plot(table(rowSums(dat)), log = "x")
+9*8
+10*8
+80+72
+blast_results <- read.table("/Users/threeprime/Documents/GoogleDrive/Kelly_Lab/Projects/Lemonade/Data/blast_20151125_1530/blast_results_all.txt")
+blast_results <- read.table("/Users/threeprime/Documents/GoogleDrive/Kelly_Lab/Projects/Lemonade/Data/blast_20151125_1530/blast_results_all.txt", sep = "\t")
+head(blast_results)
+blast_results <- read.table("/Users/threeprime/Documents/GoogleDrive/Kelly_Lab/Projects/Lemonade/Data/blast_20151125_1530/blast_results_all.txt", sep = "\t")#
+#
+# table order: output_format="6 qseqid sallseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore stitle"#
+#
+evalue_col=11#
+bitscore_col=12#
+plot(#
+	x = blast_results[, evalue_col], #
+	y = blast_results[, bitscore_col], #
+	xlab = "evalue", #
+	ylab = "bitscore"#
+	)
+plot(#
+	x = blast_results[, evalue_col], #
+	y = blast_results[, bitscore_col], #
+	xlab = "evalue", #
+	ylab = "bitscore", #
+	log = "x"#
+	)
+blast_results <- read.table("/Users/threeprime/Documents/GoogleDrive/Kelly_Lab/Projects/Lemonade/Data/blast_20151125_1530/blast_results_all.txt", sep = "\t")#
+#
+# table order: output_format="6 qseqid sallseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore stitle"#
+#
+evalue_col=11#
+bitscore_col=12#
+plot(#
+	x = blast_results[, evalue_col], #
+	y = blast_results[, bitscore_col], #
+	# log = "x", #
+	xlab = "evalue", #
+	ylab = "bitscore", #
+	)
+unique(blast_results[ , query_col ])
+blast_results <- read.table("/Users/threeprime/Documents/GoogleDrive/Kelly_Lab/Projects/Lemonade/Data/blast_20151125_1530/blast_results_all.txt", sep = "\t")#
+#
+# table order: output_format="6 qseqid sallseqid pident length mismatch gapopen qstart qend sstart send evalue bitscore stitle"#
+#
+query_col=1#
+evalue_col=11#
+bitscore_col=12#
+tax_col=13#
+#
+plot(#
+	x = blast_results[, evalue_col], #
+	y = blast_results[, bitscore_col], #
+	# log = "x", #
+	xlab = "evalue", #
+	ylab = "bitscore", #
+	)#
+dev.off()#
+#
+unique(blast_results[ , query_col ])#
+#
+# blast_results[ , ]
+query_seq <- unique(blast_results[ , query_col ])
+blast_results[ , query_col ] == query_seq[1]
+blast_results[
+blast_results[ , query_col ] == query_seq[1]
+, ]
+blast_results[ #
+blast_results[ , query_col ] == query_seq[1]#
+, bitscore_col]
+query_seq <- unique(blast_results[ , query_col ])#
+#
+blast_results[ #
+	blast_results[ , query_col ] == query_seq[1], #
+	bitscore_col#
+	]
+mylist <- list(#
+  x = c(1, 4, 6, 7, 9, 5, 4, 3, 3), #
+  y = c(4, 66, 5, 8, 3, 6, 5), #
+  z = c(4, 8, 6, 9, 55, 78, 3, 2, 2, 0, 0, 0)#
+)#
+intersect2 <- function(...) {#
+  args <- list(...)#
+  nargs <- length(args)#
+  if(nargs <= 1) {#
+    if(nargs == 1 && is.list(args[[1]])) {#
+      do.call("intersect2", args[[1]])#
+    } else {#
+      stop("cannot evaluate intersection fewer than 2 arguments")#
+    }#
+  } else if(nargs == 2) {#
+    intersect(args[[1]], args[[2]])#
+  } else {#
+    intersect(args[[1]], intersect2(args[-1]))#
   }#
-  #-------------------OUTPUT---------------------------#
-  if(return.matrix==T){#
-    return(list(interaction_matrix = imatrix, lost_animals = lostanimals, lost_plants = lostplants))  #
-  }else{#
-    if(length(lostanimals)>0){#
-      spp_data_animals <- data.frame(lost_animal = lostanimals,degree_of_extinction=degree_when_lost_animals)#
-    }else{#
-      spp_data_animals <- "No animal species were lost"#
-    }#
-    if(length(lostplants)>0){#
-      spp_data_plants <- data.frame(lost_plant = lostplants,degree_of_extinction=degree_when_lost_plants)#
-    }else{#
-      spp_data_plants <- "No plant species were lost"#
-    }#
-    return(list(cascade_data=degree_table,animal_species_data=spp_data_animals,plant_species_data=spp_data_plants))#
-  }#
-}
-install.packages("vegan")
-library(vegan)
-install.packages("bipartite")
-library(bipartite)
-??data::vegan
-??bipartite
-m=10#
-n=5#
-mat=matrix(rbinom(100,10,0.1),m,n)#
+}#
+intersect2(mylist)
+Reduce(intersect(mylist))
+Reduce(intersect, mylist)
+df1 <- data.frame(a = 1:5, b = 1:5, #
+                  row.names = letters[1:5]) # letters a to e#
+df2 <- data.frame(a = 1:5, b = 1:5, #
+                  row.names = letters[3:7]) # letters c to g#
+df3 <- data.frame(a = 1:5, b = 1:5, #
+                  row.names = letters[c(1,2,3,5,7)]) # letters a, b, c, e, and g#
 #
-coextDeg(mat,0.9,1,100) #extinction degree (the number of times one extinction spreads to the other set of species)#
-coextNumber(mat,0.1,0.4,100)#number of coextinction
-#coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
-#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
-coextNumber <- function(imatrix,rlow,rup,nsims){#
-  ext_counts <- c()#
-  for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    ranim <- rep(rvalue, nrow(imatrix))#
-    rplants <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascade(imatrix,ranim = ranim, rplants = rplants, targetGuild = guild, target = target)#
-    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
-  }#
-  return(ext_counts)#
-}
-#coextMaxLvl performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and returns how often the extinction sequence ended in each extinction level (i.e. first level, second level, third level, etc.) #
-#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
-coextDeg <- function(imatrix,rlow,rup,nsims){#
-  degs <- c()#
-  for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    ranim <- rep(rvalue, nrow(imatrix))#
-    rplants <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }   #
-    profiles <- netcascade(imatrix=imatrix,ranim=ranim,rplants=rplants,targetGuild=guild,target=target)#
-    degs[sim] <- max(profiles[[1]]$degree)#
-  }#
-  return(degs)#
-}
-m=10#
-n=5#
-mat=matrix(rbinom(100,10,0.1),m,n)
-mat
-coextDeg(mat,0.9,1,100) #extinction degree (the number of times one extinction spreads to the other set of species)#
-coextNumber(mat,0.1,0.4,100)#number of coextinction
-source("coextDeg_mod.R", "coextNumber_mod.R")
-source("coextDeg_mod.R")
-source("coextDeg_mod.R")
-setwd("/Users/threeprime/Documents/Dropbox/NIMBioS END/extinctions/Analysis")
-source("coextDeg_mod.R")
-coextDeg_mod <- source("coextDeg_mod.R")
-coextDeg_mod
-stop("hi!")
-stuff <- "poop"
-stop("hi!", stuff)
-dist_call <- rnorm
-dist_call(3)
-if(dist == "normal"){#
-    		dist_call <- rnorm#
-    	} else if(dist == "exponential"){#
-    		dist_call <- rexp#
-    	} else if(dist == "uniform"){#
-    		dist_call <- runif#
-    	}
-dist
-distr
-distr <- "normal"
-if(distr == "normal"){#
-    		dist_call <- rnorm#
-    	} else if(distr == "exponential"){#
-    		dist_call <- rexp#
-    	} else if(distr == "uniform"){#
-    		dist_call <- runif#
-    	}
-dist_call
-distr <- "uniform"
-if(distr == "normal"){#
-    		dist_call <- rnorm#
-    	} else if(distr == "exponential"){#
-    		dist_call <- rexp#
-    	} else if(distr == "uniform"){#
-    		dist_call <- runif#
-    	}
-dist_call
-distr <- "normal"
-if(distr == "normal"){#
-    		dist_call <- rnorm#
-    	} else if(distr == "exponential"){#
-    		dist_call <- rexp#
-    	} else if(distr == "uniform"){#
-    		dist_call <- runif#
-    	}
-dist_call
-rexp(3)
-rexp(3)
-stuff <- runif(3)
-stuff
-rbeta(3)
-rbeta(3, shape1 = 2, shape2 = 3)
-plot(rbeta(100, shape1 = 2, shape2 = 2))
-hist(rbeta(100, shape1 = 2, shape2 = 2))
-hist(rbeta(100, shape1 = 2, shape2 = 2))
-hist(rbeta(100, shape1 = 2, shape2 = 2))
-hist(rbeta(100, shape1 = 1, shape2 = 1))
-hist(rbeta(1000, shape1 = 1, shape2 = 1))
-hist(rbeta(10000, shape1 = 1, shape2 = 1))
-hist(rbeta(10000, shape1 = 2, shape2 = 1))
-hist(rbeta(10000, shape1 = 2, shape2 = 0.5))
-hist(rbeta(10000, shape1 = 1, shape2 = 0.5))
-hist(rbeta(10000, shape1 = 1, shape2 = -0.5))
-hist(rbeta(10000, shape1 = 1, shape2 = 0.75))
-hist(rbeta(10000, shape1 = 1, shape2 = 0.5))
-hist(rbeta(10000, shape1 = 1, shape2 = 0.25))
+dfList <- list(df1, df2, df3)
+dfList
+df1 <- data.frame(a = 1:5, b = 1:5, #
+                  row.names = letters[1:5]) # letters a to e#
+df2 <- data.frame(a = 1:5, b = 1:5, #
+                  row.names = letters[3:7]) # letters c to g#
+df3 <- data.frame(a = 1:5, b = 1:5, #
+                  row.names = letters[c(1,2,3,5,7)]) # letters a, b, c, e, and g#
+#
+dfList <- list(df1, df2, df3)#
+#
+idx <- Reduce(intersect, lapply(dfList, rownames))#
+#
+#Extract data:#
+df1[idx, ]#
+#
+# If you want to keep the corresponding rows from all data frames, you could replace the last step, df1[idx, ], with the following command:#
+do.call(rbind, lapply(dfList, "[", idx, ))
+dfList
+idx
+library(plyr)
+join(df1, df2,
+type = "inner")
+rbeta
 ?rbeta
-coextDeg <- function(imatrix, nsims, beta_par1 = , beta_par2 = ){#
-  degs <- c()#
-  for(sim in 1:nsims){#
-    ranim <- rbeta(n = nrow(imatrix), shape1 = beta_par1, shape2 = beta_par2)#
-    rplants <- rbeta(n = ncol(imatrix), shape1 = beta_par1, shape2 = beta_par2)#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }   #
-    profiles <- netcascade(imatrix=imatrix,ranim=ranim,rplants=rplants,targetGuild=guild,target=target)#
-    degs[sim] <- max(profiles[[1]]$degree)#
-  }#
-  return(degs)#
-}
-coextDeg <- function(imatrix, nsims, beta_par1 = , beta_par2 = ){
-coextDeg <- function(imatrix, nsims, beta_par1 = 1, beta_par2 = 1){#
-  degs <- c()#
-  for(sim in 1:nsims){#
-    ranim <- rbeta(n = nrow(imatrix), shape1 = beta_par1, shape2 = beta_par2)#
-    rplants <- rbeta(n = ncol(imatrix), shape1 = beta_par1, shape2 = beta_par2)#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }   #
-    profiles <- netcascade(imatrix=imatrix,ranim=ranim,rplants=rplants,targetGuild=guild,target=target)#
-    degs[sim] <- max(profiles[[1]]$degree)#
-  }#
-  return(degs)#
-}
-coextDeg(mat, 100)
-coextDeg(mat, 100, 2, 1)
-#coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
-#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
+x <- seq(0, 1, length = 21)#
+dbeta(x, 1, 1)#
+pbeta(x, 1, 1)#
 #
-coextNumber <- function(imatrix, nsims, beta_par1 = 1, beta_par2 = 1){#
-  ext_counts <- c()#
-  for(sim in 1:nsims){#
-    ranim <- rbeta(n = nrow(imatrix), shape1 = beta_par1, shape2 = beta_par2)#
-    rplants <- rbeta(n = ncol(imatrix), shape1 = beta_par1, shape2 = beta_par2)#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascade(imatrix,ranim = ranim, rplants = rplants, targetGuild = guild, target = target)#
-    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
+## Visualization, including limit cases:#
+pl.beta <- function(a,b, asp = if(isLim) 1, ylim = if(isLim) c(0,1.1)) {#
+  if(isLim <- a == 0 || b == 0 || a == Inf || b == Inf) {#
+    eps <- 1e-10#
+    x <- c(0, eps, (1:7)/16, 1/2+c(-eps,0,eps), (9:15)/16, 1-eps, 1)#
+  } else {#
+    x <- seq(0, 1, length = 1025)#
   }#
-  return(ext_counts)#
+  fx <- cbind(dbeta(x, a,b), pbeta(x, a,b), qbeta(x, a,b))#
+  f <- fx; f[fx == Inf] <- 1e100#
+  matplot(x, f, ylab="", type="l", ylim=ylim, asp=asp,#
+          main = sprintf("[dpq]beta(x, a=%g, b=%g)", a,b))#
+  abline(0,1,     col="gray", lty=3)#
+  abline(h = 0:1, col="gray", lty=3)#
+  legend("top", paste0(c("d","p","q"), "beta(x, a,b)"),#
+         col=1:3, lty=1:3, bty = "n")#
+  invisible(cbind(x, fx))#
+}#
+pl.beta(3,1)
+pl.beta(2, 4)
+pl.beta(3, 7)
+pl.beta(3, 7, asp=1)
+pl.beta(0, 0)   ## point masses at  {0, 1}
+pl.beta(0, 2)   ## point mass at 0 ; the same as
+pl.beta(3,1)
+setwd("/Users/threeprime/Documents/Dropbox/NIMBioS END/extinctions/Analysis") #Jimmy
+setwd("/Users/threeprime/Dropbox/NIMBioS_END/extinctions/Analysis") #Jimmy
+data_dir <- file.path("..", "Data")#
+#
+source("coextDeg_beta.R")#
+source("coextNumber_beta.R")#
+source("netcascade.R")
+source("functions/coextDeg_beta.R")
+source("functions/coextNumber_beta.R")
+source("functions/netcascade.R")
+par(mfrow=c(3,2), mar=c(1,1,1,1))#
+hist(rbeta(1000,0.1,1), main="") #to check beta dist#
+hist(rbeta(1000,0.5,1),main="") #to check beta dist#
+hist(rbeta(1000,1,1),main="") #to check beta dist#
+hist(rbeta(1000,3,3),main="") #to check beta dist#
+hist(rbeta(1000,4,0.1),main="") #to check beta dist
+beta.par<-matrix(c(0.1,0.5,1,3,4,1,1,1,3,0.1),ncol=2)#
+rownames(beta.par)=c("exp","power","unif","normal","left")
+# path to directory containing empirical networks:#
+emp_net_path <- file.path(data_dir, "nets_emp")
+nam<-dir(path = emp_net_path) #Plant-pollinator weighted nets
+list.net.deg<-list()#
+list.net.numb<-list()
+nam
+emp_nets<-dir(path = emp_net_path) #Plant-pollinator weighted nets
+list.net.deg<-list()#
+list.net.numb<-list()
+emp_nets
+mat_empirical <- list()#
+#
+for(p in 1:length(emp_nets)){#
+	mat_empirical[[p]] <- as.matrix(read.table(emp_nets[p]))#
 }
-coextDeg <- source("coextDeg_mod.R")
-coextDeg <- source("coextDeg_mod.R")#
-coextNumber <- source("coextNumber_mod.R")
-m <- 10#
+emp_net_path <- file.path(data_dir, "nets_emp")
+emp_net_path
+emp_nets
+for(p in 1:length(emp_nets)){#
+	mat_empirical[[p]] <- as.matrix(read.table(file.path(emp_net_path, emp_nets[p])))#
+}
+mat_empirical
+sapply(lapply(mat_empirical, rowSums), min)
+length(mat_empirical)
+sapply(lapply(mat_empirical, rowSums), min)
+length(mat_empirical)
+mat <- mat_empirical[[p]]
+rm(mat)
+p
+mat <- mat_empirical[[p]]
+if(min(c(rowSums(mat), colSums(mat))) == 0){
+stop("Hey, you have a species in your network that does not interact with any other species. The following functions will get stuck.")}
+m<-nrow(mat)
+n<-ncol(mat)
+list.deg<-list()
+list.numb<-list()
+beta.par
+for(p in 1:length(mat_empirical)){#
 #
-# let n be the number of species in Trophic level 2#
-n <- 5
-mat=matrix(rbinom(100,10,0.1),m,n)
-coextDeg(mat,0.9,1,100) #extinction degree (the number of times one extinction spreads to the other
-coextDeg
-coextDeg
-source("coextDeg_mod.R")#
-source("coextNumber_mod.R")
-m <- 10#
+  mat <- mat_empirical[[p]]#
 #
-# let n be the number of species in Trophic level 2#
-n <- 5
-mat=matrix(rbinom(100,10,0.1),m,n)
-coextDeg(imatrix = mat, nsims = 1000, beta_par1 = 1, beta_par2 = 1)
-deg_1_1 <- coextDeg(imatrix = mat, nsims = 1000, beta_par1 = 1, beta_par2 = 1)
-# 1 and 1 give uniform-like distribution#
-deg_1_1 <- coextDeg(imatrix = mat, nsims = 100, beta_par1 = 1, beta_par2 = 1)#
-num_1_1 <- coextNumber(imatrix = mat, nsims = 100, beta_par1 = 1, beta_par2 = 1)#
+  if(min(c(rowSums(mat), colSums(mat))) == 0){#
+    stop("Hey, you have a species in your network that does not interact with any other species. The following functions will get stuck.")}#
+  m<-nrow(mat)#
+  n<-ncol(mat)#
 #
-# 0.1 and 1 gives exponential-like distribution;#
-deg_0.1_1 <- coextDeg(imatrix = mat, nsims = 100, beta_par1 = 0.1, beta_par2 = 1)#
-num_0.1_1 <- coextNumber(imatrix = mat, nsims = 100, beta_par1 = 0.1, beta_par2 = 1)#
+  list.deg<-list()#
+  list.numb<-list()#
+  for(k in 1:nrow(beta.par)){#
+    #storing results for each parameter combination#
+    list.deg[[k]] <- coextDeg_beta(imatrix = mat, nsims = 1000, beta_par1_T1 = beta.par[k,1], beta_par2_T1 = beta.par[k,2],beta_par1_T2 = beta.par[k,1], beta_par2_T2 = beta.par[k,2])#
+    list.numb[[k]] <- coextNumber_beta(imatrix = mat, nsims = 1000, beta_par1_T1 = beta.par[k,1], beta_par2_T1 = beta.par[k,2],beta_par1_T2 = beta.par[k,1], beta_par2_T2 = beta.par[k,2])#
+  }#
+  #storing results for each net#
+  list.net.deg[[p]]<-list.deg #
+  list.net.numb[[p]]<-list.numb#
+}#
 #
-deg_1_1 <- coextDeg(imatrix = mat, nsims = 100, beta_par1 = 1, beta_par2 = 1)#
-num_1_1 <- coextNumber(imatrix = mat, nsims = 100, beta_par1 = 1, beta_par2 = 1)
+#------------------#
+#Plotting results#
+#------------------#
+#
+q=8#choose net#
+Temp.deg<-list.net.deg[[q]]#
+Temp.numb<-list.net.numb[[q]]#
+Temp.numb=lapply(Temp.numb,log)#
+#
+par(mfrow = c(2,1), mar=c(3,4,2,2))#
+boxplot(Temp.deg[[1]],Temp.deg[[2]],Temp.deg[[3]],Temp.deg[[4]],Temp.deg[[5]], main="Degree", col="darkgray")#
+boxplot(Temp.numb[[1]],Temp.numb[[2]],Temp.numb[[3]],Temp.numb[[4]],Temp.numb[[5]],main="Number",col="darkgray")#
+axis(1, at=1:5, label=rownames(beta.par))
+list.net.deg
+length(mat_empirical)
+list.net.deg
+boxplot(Temp.deg[[1]],Temp.deg[[2]],Temp.deg[[3]],Temp.deg[[4]],Temp.deg[[5]], main="Degree", col="darkgray")
+Temp.deg<-list.net.deg[[q]]
+length(list.net.deg)
+length(list.net.numb)
+mat <- mat_empirical[[p]]
+mat_empirical
 mat
-mat <- matrix(rbinom(100,10,0.1),m,n)
-mat
-rowSums(mat)
-colSums(mat)
-c(rowSums(mat), colSums(mat))
-min(c(rowSums(mat), colSums(mat)))
-if(min(c(rowSums(mat), colSums(mat))) == 0)#
-	stop("Hey, you have a species in your network that does not interact with any other species. The following functions will get stuck.")
-deg_1_1 <- coextDeg(imatrix = mat, nsims = 100, beta_par1 = 1, beta_par2 = 1)#
-num_1_1 <- coextNumber(imatrix = mat, nsims = 100, beta_par1 = 1, beta_par2 = 1)
-# 1 and 1 give uniform-like distribution#
-deg_1_1 <- coextDeg(imatrix = mat, nsims = 1000, beta_par1 = 1, beta_par2 = 1)#
-num_1_1 <- coextNumber(imatrix = mat, nsims = 1000, beta_par1 = 1, beta_par2 = 1)#
-#
-# 0.1 and 1 gives exponential-like distribution;#
-deg_0.1_1 <- coextDeg(imatrix = mat, nsims = 1000, beta_par1 = 0.1, beta_par2 = 1)#
-num_0.1_1 <- coextNumber(imatrix = mat, nsims = 1000, beta_par1 = 0.1, beta_par2 = 1)#
-#
-# 3 and 3 give normal-like distribution#
-deg_3_3 <- coextDeg(imatrix = mat, nsims = 1000, beta_par1 = 3, beta_par2 = 3)#
-num_3_3 <- coextNumber(imatrix = mat, nsims = 1000, beta_par1 = 3, beta_par2 = 3)
-num_3_3
-par(mfrow = c(2,3))
-par(mfrow = c(2,3))
-hist(deg_1_1)
-hist(deg_1_1, xlab = "degree", main = "beta(1,1)")
-hist(num_1_1, xlab = "degree", main = "beta(1,1) 'uniform'")
-pdf(file = "R_from_beta.pdf")#
-#
-par(mfrow = c(2,3))#
-hist(deg_1_1, xlab = "degree", main = "beta(1,1) 'uniform'")#
-hist(deg_0.1_1, xlab = "degree", main = "beta(0.1,1) 'exponential'")#
-hist(deg_3_3, xlab = "degree", main = "beta(3,3) 'normal'")#
-hist(num_1_1, xlab = "degree", main = "beta(1,1) 'uniform'")#
-hist(num_0.1_1, xlab = "degree", main = "beta(0.1,1) 'exponential'")#
-hist(num_3_3, xlab = "degree", main = "beta(3,3) 'normal'")#
-#
-dev.off()
-pdf(file = "R_from_beta.pdf")#
-#
-par(mfrow = c(2,3))#
-hist(deg_1_1, xlab = "degree", main = "beta(1,1) 'uniform'")#
-hist(deg_0.1_1, xlab = "degree", main = "beta(0.1,1) 'exponential'")#
-hist(deg_3_3, xlab = "degree", main = "beta(3,3) 'normal'")#
-hist(num_1_1, xlab = "number", main = "beta(1,1) 'uniform'")#
-hist(num_0.1_1, xlab = "number", main = "beta(0.1,1) 'exponential'")#
-hist(num_3_3, xlab = "number", main = "beta(3,3) 'normal'")#
-#
-dev.off()
-par(mfrow = c(2,3))#
-hist(deg_1_1, xlab = "degree", main = "beta(1,1) 'uniform'", ylim = c(0,1000))#
-hist(deg_0.1_1, xlab = "degree", main = "beta(0.1,1) 'exponential'", ylim = c(0,1000))#
-hist(deg_3_3, xlab = "degree", main = "beta(3,3) 'normal'", ylim = c(0,1000))#
-hist(num_1_1, xlab = "number", main = "beta(1,1) 'uniform'", ylim = c(0,1000))#
-hist(num_0.1_1, xlab = "number", main = "beta(0.1,1) 'exponential'", ylim = c(0,1000))#
-hist(num_3_3, xlab = "number", main = "beta(3,3) 'normal'", ylim = c(0,1000))
-vec <- round( runif(n = 10, min = -10, max = 10) )
-vec
-vec_norm <- (vec - min(vec))/(max(vec) - min(vec))
-vec_norm
-891/40
+p
+length(mat_empirical)
+m<-nrow(mat)
+n<-ncol(mat)
+list.deg<-list()#
+  list.numb<-list()
+list.deg
+list.numb
+nrow(beta.par)
+beta.par
+for(k in 1:nrow(beta.par)){
+list.deg[[k]] <- coextDeg_beta(imatrix = mat, nsims = 1000, beta_par1_T1 = beta.par[k,1], beta_par2_T1 = beta.par[k,2],beta_par1_T2 = beta.par[k,1], beta_par2_T2 = beta.par[k,2])
+list.numb[[k]] <- coextNumber_beta(imatrix = mat, nsims = 1000, beta_par1_T1 = beta.par[k,1], beta_par2_T1 = beta.par[k,2],beta_par1_T2 = beta.par[k,1], beta_par2_T2 = beta.par[k,2])
+}

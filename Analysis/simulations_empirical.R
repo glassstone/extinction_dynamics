@@ -1,11 +1,15 @@
 
 
 #setwd("/Users/threeprime/Documents/Dropbox/NIMBioS END/extinctions/Analysis") Jimmy
-setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Analysis") #Mathias
+# setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Analysis") #Mathias
+setwd("/Users/threeprime/Dropbox/NIMBioS_END/extinctions/Analysis") #Jimmy
+# setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Analysis") #Mathias
 
-source("coextDeg_beta.R")
-source("coextNumber_beta.R")
-source("netcascade.R")
+data_dir <- file.path("..", "Data")
+
+source("functions/coextDeg_beta.R")
+source("functions/coextNumber_beta.R")
+source("functions/netcascade.R")
 
 # suggested beta distribution parameters:
 # 0.1 and 1 gives exponential-like distribution;
@@ -21,22 +25,37 @@ hist(rbeta(1000,1,1),main="") #to check beta dist
 hist(rbeta(1000,3,3),main="") #to check beta dist
 hist(rbeta(1000,4,0.1),main="") #to check beta dist
 
-beta.par<-matrix(c(0.1,0.5,1,3,4,1,1,1,3,0.1),ncol=2)
+beta.par <- matrix(c(0.1,0.5,1,3,4,1,1,1,3,0.1),ncol=2)
 rownames(beta.par)=c("exp","power","unif","normal","left")
 
 #Computes the cascade degree and extinction numbers for each matrix 
 #Different parameter combinations (bet.par)
 #All species have the same initial probability of initial extinction
 
-setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Data")
-nam<-dir() #Plant-pollinator weighted nets
+# path to directory containing empirical networks:
+emp_net_path <- file.path(data_dir, "nets_emp")
+
+# load all networks in that directory
+emp_nets<-dir(path = emp_net_path) #Plant-pollinator weighted nets
 
 #Testing different nets
 list.net.deg<-list()
 list.net.numb<-list()
-for(p in 5:length(nam)){
 
-  mat<-as.matrix(read.table(nam[p])) #importing matrix
+mat_empirical <- list()
+
+for(p in 1:length(emp_nets)){
+	mat_empirical[[p]] <- as.matrix(read.table(file.path(emp_net_path, emp_nets[p])))
+}
+
+sapply(lapply(mat_empirical, rowSums), min)
+# mat_empirical[[4]] <- NULL
+length(mat_empirical)
+
+for(p in 1:length(mat_empirical)){
+
+  mat <- mat_empirical[[p]]
+
   if(min(c(rowSums(mat), colSums(mat))) == 0){
     stop("Hey, you have a species in your network that does not interact with any other species. The following functions will get stuck.")}
   
@@ -46,10 +65,12 @@ for(p in 5:length(nam)){
   list.deg<-list()
   list.numb<-list()
   for(k in 1:nrow(beta.par)){
+  	
     #storing results for each parameter combination
-    list.deg[[k]] <- coextDeg_beta(imatrix = mat, nsims = 1000, beta_par1_T1 = beta.par[5,1], beta_par2_T1 = beta.par[5,2],beta_par1_T2 = beta.par[k,1], beta_par2_T2 = beta.par[k,2])
-    list.numb[[k]] <- coextNumber_beta(imatrix = mat, nsims = 1000, beta_par1_T1 = beta.par[5,1], beta_par2_T1 = beta.par[5,2],beta_par1_T2 = beta.par[k,1], beta_par2_T2 = beta.par[k,2])
+    list.deg[[k]] <- coextDeg_beta(imatrix = mat, nsims = 1000, beta_par1_T1 = beta.par[k,1], beta_par2_T1 = beta.par[k,2],beta_par1_T2 = beta.par[k,1], beta_par2_T2 = beta.par[k,2])
+    list.numb[[k]] <- coextNumber_beta(imatrix = mat, nsims = 1000, beta_par1_T1 = beta.par[k,1], beta_par2_T1 = beta.par[k,2],beta_par1_T2 = beta.par[k,1], beta_par2_T2 = beta.par[k,2])
   }
+  
   #storing results for each net
   list.net.deg[[p]]<-list.deg 
   list.net.numb[[p]]<-list.numb
@@ -62,7 +83,7 @@ for(p in 5:length(nam)){
 q=8#choose net
 Temp.deg<-list.net.deg[[q]]
 Temp.numb<-list.net.numb[[q]]
-Temp.numb=lapply(Temp.numb,log)
+Temp.numb <- lapply(Temp.numb,log)
 
 par(mfrow = c(2,1), mar=c(3,4,2,2))
 boxplot(Temp.deg[[1]],Temp.deg[[2]],Temp.deg[[3]],Temp.deg[[4]],Temp.deg[[5]], main="Degree", col="darkgray")
@@ -72,7 +93,7 @@ axis(1, at=1:5, label=rownames(beta.par))
 
 #Results
 #Changing the distributions have small effects
-#The liklelihood of large cascades only increase for left skewed distribuition of R
+#The likelihood of large cascades only increase for left skewed distribuition of R
 
 #To do
 #1.Targeted extinctions (JO)
@@ -83,10 +104,6 @@ axis(1, at=1:5, label=rownames(beta.par))
 
 #4.What happens if distributions are different for plants and pollinators?
 #5.Measure the number of extinctions of plants and animals separately
-
-
-
-
 
 #Random weighted net
 # let m be the number of species in Trophic level 1

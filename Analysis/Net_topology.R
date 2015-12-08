@@ -2,9 +2,10 @@
 #Analysis of the topology of networks after extinction cascades 
 #(We need to recover the nets after extinctions)
 #analysis of the topological role of exinct and extant species after cascades 
-#(We need to recover a list of extinct and a list o extant species after cascades)
+#(We need to recover a list of extinct and a list of extant species after cascades)
 #=============================================================================
 
+=======
 library(tnet)
 library(bipartite)
 setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Data")
@@ -62,6 +63,14 @@ for (i in 1:length(rem.percentage)){
   nonzero.r<-nonzero.list[-(1:remove)]
   mat.aux<-matrix(0,A,P)
   mat.aux[nonzero.r]<-1
+=======
+vec<-seq(0,0.1,by=0.05) #threshold vector
+
+#!!!!Check matrix transformation!!!
+for (i in 1:length(vec)){
+  mat.aux<-mat/sum(mat)
+  mat.aux[mat.aux>vec[i]]=1
+  mat.aux[mat.aux<vec[i]]=0
   
   #removing disconnected spp
   zero.r<-which(apply(mat.aux,1,sum)==0)
@@ -99,6 +108,7 @@ ND(mat)
 #................
 
 T=web2edges(mat,both.direction=TRUE, return=TRUE) #edge list
+
 degrees<-degree_w(T,measure=c("degree", "output", "alpha"),alpha=0.5) 
 
 #plotting
@@ -109,6 +119,11 @@ hist(degrees[(A+1):(P+A),2], main="Columns",xlab="k")
 par(mfrow=c(2,1), mar=c(4,3,3,3))
 hist(degrees[1:A,4], main="Rows",xlab="wk")
 hist(degrees[(A+1):(P+A),4], main="Columns",xlab="wk")
+
+#................................
+#species dependencies distribution
+#maybe we can use blutghen index
+#.................................
 
 
 #................................
@@ -123,4 +138,9 @@ hist(as.numeric(pw_dist))
 
 #Bipartite has a function that computes all metrics now. We may be able to extract some additional info using it
 ALL=networklevel(mat)
-mat
+distance_w(T, directed=FALSE)
+
+
+#Bipartite has a function that computes all metrics now...
+networklevel(mat)
+
