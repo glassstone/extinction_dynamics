@@ -60,21 +60,12 @@ Simulations proceed by removing one species at a given trophic level, and removi
 
 \end{enumerate}
 
+
+
+
+
+
 \subsubsection*{What we've done}
-
-\begin{enumerate}
-	\item{Generalized the model so each species has an R value}
-	\item{R values are sampled from a probability distribution}
-	\item{Exploring how extinctions cascades respond to R distributions with different shapes}	
-\end{enumerate}
-
-
-
-
-
-
-
-\subsubsection*{Done}
 
 \begin{itemize}
 
@@ -82,6 +73,7 @@ Simulations proceed by removing one species at a given trophic level, and removi
 
 	\item R values are sampled from a probability distribution
 
+	\item Exploring how extinctions cascades respond to R distributions with different shapes	
 \end{itemize}
 
 \subsubsection*{Next steps/TODO}
@@ -115,6 +107,8 @@ Probability that $i$ increases in density is given by:
 $Q_{ij} = R_{ij} d_{ji}$, if $i$ is a prey species 
 
 if the density increases we could have one iteration step where interaction frequencies are changed by some factor - assuming that population density affects interaction frequencies
+
+Vieira and Almeida-Neto refer to ``the probability of an extinction cascade'' as the probability of a primary extinction resulting in additional extinctions (though really, this is just the simulated frequency).
 
 
 
