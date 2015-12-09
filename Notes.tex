@@ -3,6 +3,18 @@
 \begin{document}
 
 
+\subsubsection*{Notes from Tuesday 8 December 2015}
+Reasons to modify $R$:
+\begin{itemize}
+	\item * Asymmetry: e.g. most plants can self-pollinate; all bees are obligate nectar feeders. Method: $R_{bees} ~ beta(10,0.8)$; $R_{plants} ~ beta(0.1,1)$
+	\item * Bimodal: $R_{plants} ~ beta(0.2,0.2)$
+	\item (hard) Taxon specific information (e.g. wasps eat meat)
+	\item * $R$ determined by individual species' interaction degree and strength distribution (correlated or not, depending on the system)
+	\item * Shuffle $R$ for each iteration/extinction event
+	\item (hard) allow for host-switching: internal (new links arise) vs external ($R$ compensates as interactions dissolve)
+	\item Species ID matters (Memmot) \textit{JO: not sure what this meant}
+\end{itemize}
+
 \subsubsection*{Background}
 Vieira and Almeida-Neto (2014) proposed a stochastic coextinction model to simulate extinction cascades with more complexity than previous models. One major finding contrary to existing (topological coextinction) models (TCM) was that the likelihood and severity (degree; ``the number of extinction episodes, with each episode involving one or more species, summed across both tropic levels'') of a cascade increases with network connectance in mutualistic networks. Their model (1) picked species at random for the primary extinction event, and (2) incorporated information about the species' dependence on the interaction, $R$, but drew this value randomly from a uniform distribution, independent of other properties of the species, and applied the same value to all species. Importantly, they showed that $R$ chosen from either low, medium, or high values has substantial impact on the outcome of the extinction cascade (probability of a cascade, mean number of extinctions, proportion spp lost). However, we know that not all species are equally prone to extinction, and the dependence of a species on an interaction network can covary with other properties of the species. We build upon their model by modifying the parameter $R$, with the goal of making coextinction simulations more realistic by incorporating information from ecological networks and conducting simulations on both empirical and simulated datasets. We report how the covariation between species' network traits (e.g. degree, strength, specialization) and their dependence on a network $R$ impacts coextinction cascades. Further, we assess differences in network structure and species' traits before and after extinction cascades.
 Further, we test our model on simulated networks generated according to parameters that people seem to think are important properties of mutualistic networks. 
@@ -70,11 +82,11 @@ Simulations proceed by removing one species at a given trophic level, and removi
 
 	\item R values are sampled from a probability distribution
 
-\end{enumerate}
+\end{itemize}
 
 \subsubsection*{Next steps/TODO}
 
-\begin{enumerate}
+\begin{itemize}
 	
 	\item We are currently exploring how extinctions cascades respond to R distributions with different shapes
 	
@@ -109,7 +121,6 @@ if the density increases we could have one iteration step where interaction freq
 A. response of model output to probabilistic values of R\\
 B. behavior of model on non-mutualistic interactions\\
 C. merge multiple networks using multi-layer network approach (perhaps very difficult)
-
 
 
 
