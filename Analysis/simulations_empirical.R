@@ -18,15 +18,13 @@ source("functions/netcascade.R")
 # 3 and 3 give normal-like distribution
 # 4 and 0.1 give a left skewed distribution
 
-par(mfrow=c(3,2), mar=c(1,1,1,1))
-hist(rbeta(1000,0.1,1), main="") #to check beta dist
-hist(rbeta(1000,0.5,1),main="") #to check beta dist
-hist(rbeta(1000,1,1),main="") #to check beta dist
-hist(rbeta(1000,3,3),main="") #to check beta dist
-hist(rbeta(1000,4,0.1),main="") #to check beta dist
+beta.par <- matrix(c(0.1, 1, 0.5, 1, 1, 1, 3, 3, 4, 0.1, 0.2, 0.2), byrow = TRUE, ncol = 2)
+rownames(beta.par)=c("exp","power","unif","normal","left", "bimod")
 
-beta.par <- matrix(c(0.1,0.5,1,3,4,1,1,1,3,0.1),ncol=2)
-rownames(beta.par)=c("exp","power","unif","normal","left")
+par(mfrow=c(3,2)) #, mar=c(1,1,1,1)
+for(i in 1:nrow(beta.par)){
+	hist(rbeta(1000, beta.par[i,1], beta.par[i,2]), main = rownames(beta.par)[i], xlab = "R")
+}
 
 #Computes the cascade degree and extinction numbers for each matrix 
 #Different parameter combinations (bet.par)
