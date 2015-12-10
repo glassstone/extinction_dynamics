@@ -6,6 +6,7 @@ setwd("/Users/threeprime/Dropbox/NIMBioS_END/extinctions/Analysis") #Jimmy
 # setwd("/Users/piresmm/Dropbox/NIMBioS Working Group/extinctions/Analysis") #Mathias
 
 data_dir <- file.path("..", "Data")
+fig_dir <- file.path("..", "Figures")
 
 source("functions/coextDeg_beta.R")
 source("functions/coextNumber_beta.R")
@@ -17,15 +18,17 @@ source("functions/netcascade.R")
 # 1 and 1 give uniform-like distribution
 # 3 and 3 give normal-like distribution
 # 4 and 0.1 give a left skewed distribution
+# 0.2 and 0.2 give a bimodal distribution
 
 beta.par <- matrix(c(0.1, 1, 0.5, 1, 1, 1, 3, 3, 4, 0.1, 0.2, 0.2), byrow = TRUE, ncol = 2)
 rownames(beta.par)=c("exp","power","unif","normal","left", "bimod")
 
+pdf(file = "R_input_beta.pdf")
 par(mfrow=c(3,2)) #, mar=c(1,1,1,1)
 for(i in 1:nrow(beta.par)){
 	hist(rbeta(1000, beta.par[i,1], beta.par[i,2]), main = rownames(beta.par)[i], xlab = "R")
 }
-
+dev.off()
 #Computes the cascade degree and extinction numbers for each matrix 
 #Different parameter combinations (bet.par)
 #All species have the same initial probability of initial extinction
