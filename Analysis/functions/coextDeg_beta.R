@@ -8,19 +8,27 @@
 coextDeg_beta <- function(imatrix, nsims, beta_par1_T1 = 1, beta_par2_T1 = 1,beta_par1_T2 = 1, beta_par2_T2 = 1){
   degs <- c()
   for(sim in 1:nsims){
-    ranim <- rbeta(n = nrow(imatrix), shape1 = beta_par1_T1, shape2 = beta_par2_T1)
-    rplants <- rbeta(n = ncol(imatrix), shape1 = beta_par1_T2, shape2 = beta_par2_T2)
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))
+    R_rows <- rbeta(n = nrow(imatrix), shape1 = beta_par1_T1, shape2 = beta_par2_T1)
+    R_cols <- rbeta(n = ncol(imatrix), shape1 = beta_par1_T2, shape2 = beta_par2_T2)
+    guild <- sample(c('rows','cols'),1,F,c(nrow(imatrix),ncol(imatrix)))
     if(guild=="animal"){
       target <- rep(1,nrow(imatrix)) #same probability of primary extinction for all spp
     }else{
       target <- rep(1,ncol(imatrix)) #same probability of primary extinction for all spp
-    }   
-    profiles <- netcascade(imatrix=imatrix,ranim=ranim,rplants=rplants,targetGuild=guild,target=target)
+    }
+    profiles <- netcascade_JO(
+							imatrix = imatrix, 
+							R_rows = R_rows, 
+							R_cols = R_cols, 
+							unluckyGuild = guild, 
+							unluckySpecies = target, 
+							return.matrix=FALSE
+							)
     degs[sim] <- max(profiles[[1]]$degree)
   }
   return(degs)
 }
+
 
 
 

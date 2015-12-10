@@ -1,6 +1,6 @@
 #(December 8 2015).
 
-netcascadeJO <- function(
+netcascade_JO <- function(
 					imatrix, 
 					R_rows, 
 					R_cols, 

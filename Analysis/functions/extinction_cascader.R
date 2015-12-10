@@ -43,8 +43,8 @@ extinction_cascader <- function(imatrix, R_row, R_col, nsims){
 
 		cascaded[[i]] <- netcascadeJO(
 									imatrix = imatrix, 
-									R_rows = runif(nrow(imatrix), min = 0, max = 0.3), 
-									R_cols = runif(ncol(imatrix), min = 0, max = 0.3), 
+									R_rows = R_row, 
+									R_cols = R_col, 
 									unluckyGuild = unluckyGuildArg,
 									unluckySpecies = unluckySpeciesArg, 
 									return.matrix = TRUE

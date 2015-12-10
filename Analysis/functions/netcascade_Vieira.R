@@ -1,6 +1,6 @@
 #(April 23 2014).
 
-netcascade <- function(imatrix,ranim,rplants,deadPlants=NULL, deadAnimals=NULL, targetGuild,target,return.matrix=F){
+netcascade_Vieira <- function(imatrix,ranim,rplants,deadPlants=NULL, deadAnimals=NULL, targetGuild,target,return.matrix=F){
   
   #---------ARGUMENT CHECKS-----------------------------------
   

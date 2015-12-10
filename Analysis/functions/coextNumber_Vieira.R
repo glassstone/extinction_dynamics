@@ -1,7 +1,7 @@
 #coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.
 #primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)
 
-coextNumber <- function(imatrix,rlow,rup,nsims){
+coextNumber_Vieira <- function(imatrix,rlow,rup,nsims){
   ext_counts <- c()
   for(sim in 1:nsims){
     rvalue <- runif(1,rlow,rup)
@@ -13,7 +13,7 @@ coextNumber <- function(imatrix,rlow,rup,nsims){
     }else{
       target <- rep(1,ncol(imatrix))
     }    
-    sim_results <- netcascade(imatrix,ranim = ranim, rplants = rplants, targetGuild = guild, target = target)
+    sim_results <- netcascade_Vieira(imatrix,ranim = ranim, rplants = rplants, targetGuild = guild, target = target)
     ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)
   }
   return(ext_counts)

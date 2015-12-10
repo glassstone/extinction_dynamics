@@ -22,6 +22,12 @@ mat_empirical[[4]] <- NULL
 
 R_by_guild <- expand.grid(R_options, R_options)
 
+
+###########################################################
+#------------- RUN THE SIMULATIONS
+###########################################################
+N_iterations <- 100
+
 R_combo_out <- list()
 
 for(Rcombo in 1:nrow(R_by_guild)){
@@ -47,7 +53,7 @@ for(Rcombo in 1:nrow(R_by_guild)){
 		m<-nrow(mat)
 		n<-ncol(mat)
 		
-		stored_events[[i]] <- extinction_cascader(imatrix = mat, R_row = current_Rrows, R_col = current_Rcols, nsims = 10000)
+		stored_events[[i]] <- extinction_cascader(imatrix = mat, R_row = current_Rrows, R_col = current_Rcols, nsims = N_iterations)
 		
 		just_extinctions[[i]] <- lapply(stored_events[[i]], "[", c("lost_cols", "lost_rows"))
 		
@@ -65,9 +71,35 @@ for(Rcombo in 1:nrow(R_by_guild)){
 
 }
 
-# for 6 networks and 72 R combos: took approximately 3 hrs on 2.3GHz*4 16GBRAM
+lsos()
 
 
+# for 6 networks and 72 R combos, for 10000 iterations: took approximately 3 hrs on 2.3GHz*4 16GBRAM
+save(R_combo_out, file = "R_72_net_6_iter100.RData")
+
+names(R_combo_out) <- apply(X = as.matrix(R_by_guild), MARGIN = 1, FUN = function(x) paste(x, sep = "", collapse = ""))
+
+# R_combo_out
+	# [[1:81 R_combo]]
+	# [[1:6 
+		# 1: stored_events, 
+		# 2: just_extinctions, 
+		# 3: extinctions_by_guild, 
+		# 4: total_extinctions, 
+		# 5: total_cascades, 
+		# 6: cascade_frequency]]
+	# [[1:8 network]]
+	# [[1:N_iterations]]
+
+freq_VAlow <- do.call(c, R_combo_out[["VA_lowVA_low"]][[6]])
+freq_VAmed <- do.call(c, R_combo_out[["VA_medVA_med"]][[6]])
+freq_VAhigh <- do.call(c, R_combo_out[["VA_highVA_high"]][[6]])
+
+freq_VAhilo <- do.call(c, R_combo_out[["VA_highVA_low"]][[6]])
+
+
+
+length(R_combo_out[[1]])
 #--------------------PLOTTING---------------------------------------
 
 # boxplot(sum(number_cascades > 1)/length(number_cascades))
