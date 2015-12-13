@@ -1,7 +1,3 @@
-dfList
-idx
-library(plyr)
-join(df1, df2,
 type = "inner")
 rbeta
 ?rbeta
@@ -249,231 +245,10 @@ for(Rcombo in 1:nrow(R_by_guild)){#
 }#
 #
 lsos()
-load("/Users/threeprime/Dropbox/Compute/R/general/lsos.RData")
-setwd("/Users/threeprime/Dropbox/NIMBioS_END/extinctions/Analysis")
-data_dir <- file.path("..", "Data")#
-fig_dir <- file.path("..", "Figures")#
-source("functions/netcascade_JO.R")#
-source("functions/extinction_cascader.R")#
-#
-beta.par <- matrix(c(0.1, 1, 0.5, 1, 1, 1, 3, 3, 4, 0.1, 0.2, 0.2), byrow = TRUE, ncol = 2)#
-rownames(beta.par)=c("exp","power","unif","normal","left", "bimod")#
-R_options <- c("VA_low", "VA_med", "VA_high", rownames(beta.par))#
-#
-# path to directory containing empirical networks:#
-emp_net_path <- file.path(data_dir, "nets_emp")#
-#
-# load all networks in that directory#
-emp_nets<-dir(path = emp_net_path) #Plant-pollinator weighted nets#
-#
-mat_empirical <- list()#
-#
-for(p in 1:length(emp_nets)){#
-	mat_empirical[[p]] <- as.matrix(read.table(file.path(emp_net_path, emp_nets[p])))#
-}#
-mat_empirical[[4]] <- NULL#
-#
-R_by_guild <- expand.grid(R_options, R_options)#
-############################################################
-#------------- RUN THE SIMULATIONS#
-############################################################
-N_iterations <- 100#
-#
-R_combo_out <- list()#
-#
-for(Rcombo in 1:nrow(R_by_guild)){#
-	current_Rrows <- as.character(R_by_guild[Rcombo,1])#
-	current_Rcols <- as.character(R_by_guild[Rcombo,2])#
-	# DO THE SIMULATIONS ON EACH NETWORK#
-	stored_events <- list()#
-	just_extinctions <- list()#
-	extinctions_by_guild <- list()#
-	total_extinctions <- list()#
-	total_cascades <- list()#
-	cascade_frequency <- list()#
-	for(i in 1:length(mat_empirical)){#
-		mat <- mat_empirical[[i]]#
-		if(min(c(rowSums(mat), colSums(mat))) == 0){#
-		stop("Hey, you have a species in your network that does not interact with any other species. The following functions will get stuck.")}#
-		m<-nrow(mat)#
-		n<-ncol(mat)#
-		stored_events[[i]] <- extinction_cascader(imatrix = mat, R_row = current_Rrows, R_col = current_Rcols, nsims = N_iterations)#
-		just_extinctions[[i]] <- lapply(stored_events[[i]], "[", c("lost_cols", "lost_rows"))#
-		extinctions_by_guild[[i]] <- do.call(rbind, lapply(just_extinctions[[i]], lengths))#
-		total_extinctions[[i]] <- rowSums(extinctions_by_guild[[i]])#
-		total_cascades[[i]] <- sum(total_extinctions[[i]] > 1)#
-		cascade_frequency[[i]] <- total_cascades[[i]]/length(stored_events[[i]])#
-	}#
-#
-	R_combo_out[[Rcombo]] <- list(stored_events, just_extinctions, extinctions_by_guild, total_extinctions, total_cascades, cascade_frequency)#
-#
-}#
-#
-lsos()
-save(R_combo_out, file = "R_72_net_6_iter100.RData")
-R_combo_out
-length(R_combo_out)
-nrow(R_by_guild)
-R_by_guild
-R_combo_out
-R_combo_out[[1]]
-names(R_combo_out)
-R_by_guild[1,]
-paste(R_by_guild[1,])
-paste(R_by_guild[1,], sep = "")
-collapse(R_by_guild[1,])
-coll(R_by_guild[1,])
-paste(R_by_guild[1,], sep "", collapse = "")
-R_by_guild[1,]
-paste(as.character(R_by_guild[1,]), sep "", collapse = "")
-paste(R_by_guild[1,], sep = "", collapse = "")
-paste(R_by_guild[1,], sep = "", collapse = "")
-as.character(R_by_guild[1,])
-R_by_guild
-as.character(R_by_guild)
-class(R_by_guild)
-as.matrix(R_by_guild)
-paste(as.matrix(R_by_guild[1,]), sep = "", collapse = "")
-apply(X = as.matrix(R_by_guild), MARGIN = 1, FUN = function(x) paste(x, sep = "", collapse = ""))
-names(R_combo_out) <- apply(X = as.matrix(R_by_guild), MARGIN = 1, FUN = function(x) paste(x, sep = "", collapse = ""))
-save(R_combo_out, file = "R_72_net_6_iter100.RData")
-length(R_combo_out[[1]])
-length(R_combo_out[[1]])
-length(R_combo_out[[1]][[1]])
-length(R_combo_out[[1]][[1]])
-length(R_combo_out[[1]][[1]][[1]])
-length(R_combo_out[[1]][[1]][[2]])
-length(R_combo_out[[1]][[1]][[3]])
-R_combo_out[[1]][[1]][[3]]
-R_combo_out[[1]][[1]][[9]]
-R_combo_out[[1]][[1]][[8]]
-R_combo_out[[1]][[2]][[8]]
-R_combo_out[[1]][[3]][[8]]
-R_combo_out[[1]][[4]][[8]]
-R_combo_out[[1]][[2]][[8]]
-R_combo_out[[1]][[3]][[8]]
-R_combo_out[[1]][[4]][[8]]
-R_combo_out[[1]][[3]][[8]]
-R_combo_out[[1]][[4]][[8]]
-R_combo_out[[1]][[8]][[8]]
-R_combo_out[[1]][[7]][[8]]
-R_combo_out[[1]][[6]][[8]]
-R_combo_out[[1]][[1]][[8]]
-R_combo_out[[1]][[1]][[2]]
-R_combo_out[[1]][[1]][[9]]
-R_combo_out[[1]][[1]][[8]]
-R_combo_out[[1]][[1]][[2]]
-R_combo_out[[1]][[1]][[1]]
-R_combo_out[[1]][[1]][[2]]
-R_combo_out[[1]][[1]][[3]]
-names(R_combo_out)
-names(R_combo_out[[1]])
-names(R_combo_out[[2]])
-names(R_combo_out[[1]][[1]])
-names(R_combo_out[[1]][[2]])
-names(R_combo_out[[1]])
-names(R_combo_out[[1]][[1]][[1]])
-names(R_combo_out[[1]][[1]][[2]])
-str(R_combo_out)
-length(R_combo_out)
-length(R_combo_out[[1]])
-R_combo_out[[1]][[1]]
-R_combo_out[[1]][[7]]
-R_combo_out[[1]][[6]]
-R_combo_out[[1]][[2]]
-R_combo_out[[1]][[3]]
-R_combo_out[[1]][[4]]
-4: total_extinctions
-R_combo_out[[1]][[cascade_frequency]]
-R_combo_out[[1]][[6]]
-names(R_combo_out)
-R_combo_out[["VAlowVAlow"]][[6]]
-R_combo_out["VAlowVAlow"][[6]]
-R_combo_out["VA_lowVA_low"][[6]]
-R_combo_out[["VA_lowVA_low"]][[6]]
-R_combo_out[["VA_lowVA_low"]][[6]]#
-R_combo_out[["VA_medVA_med"]][[6]]#
-R_combo_out[["VA_highVA_high"]][[6]]
-as.vector(R_combo_out[["VA_lowVA_low"]][[6]])
-do.call(c, R_combo_out[["VA_lowVA_low"]][[6]])
-freq_VAlow <- do.call(c, R_combo_out[["VA_lowVA_low"]][[6]])#
-freq_VAmed <- do.call(c, R_combo_out[["VA_medVA_med"]][[6]])#
-freq_VAhigh <- do.call(c, R_combo_out[["VA_highVA_high"]][[6]])
-set.seed(1)
-stripchart(#
-  x = list(freq_VAlow, freq_VAmed, freq_VAhigh), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 0.8,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n"#
-  # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
-)
-mat_empirical
-length(mat_empirical)
-freq_VAhilo <- do.call(c, R_combo_out[["VA_highVA_low"]][[6]])
-freq_VAhilo
-stripchart(#
-  x = list(freq_VAlow, freq_VAmed, freq_VAhigh, freq_VAhilo), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 0.8,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n"#
-  # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
-)
-R_by_guild
-stripchart(#
-  x = list(freq_VAlow, freq_VAmed, freq_VAhigh, freq_VAhilo), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 0.8,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n"#
-  # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
-)
-stripchart(#
-  x = list(freq_VAlow, freq_VAmed, freq_VAhigh, freq_VAhilo), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 0.8,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n"#
-  # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
-)
-stripchart(#
-  x = list(freq_VAlow, freq_VAmed, freq_VAhigh, freq_VAhilo), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 10,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n"#
-  # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
-)
-#coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
+#coextMaxLvl performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and returns how often the extinction sequence ended in each extinction level (i.e. first level, second level, third level, etc.) #
 #primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
-coextNumber_Vieira <- function(imatrix,rlow,rup,nsims){#
-  ext_counts <- c()#
+coextDeg_Vieira <- function(imatrix,rlow,rup,nsims){#
+  degs <- c()#
   for(sim in 1:nsims){#
     rvalue <- runif(1,rlow,rup)#
     ranim <- rep(rvalue, nrow(imatrix))#
@@ -483,11 +258,11 @@ coextNumber_Vieira <- function(imatrix,rlow,rup,nsims){#
       target <- rep(1,nrow(imatrix))#
     }else{#
       target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascade_Vieira(imatrix,ranim = ranim, rplants = rplants, targetGuild = guild, target = target)#
-    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
+    }   #
+    profiles <- netcascade_Vieira(imatrix=imatrix,ranim=ranim,rplants=rplants,targetGuild=guild,target=target)#
+    degs[sim] <- max(profiles[[1]]$degree)#
   }#
-  return(ext_counts)#
+  return(degs)#
 }
 #(April 23 2014).#
 #
@@ -630,6 +405,42 @@ netcascade_Vieira <- function(imatrix,ranim,rplants,deadPlants=NULL, deadAnimals
     return(list(cascade_data=degree_table,animal_species_data=spp_data_animals,plant_species_data=spp_data_plants))#
   }#
 }
+ls()
+load("/Users/threeprime/Dropbox/Compute/R/general/lsos.RData")
+lsos
+.ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)
+# source http://stackoverflow.com/questions/1358003/tricks-to-manage-the-available-memory-in-an-r-session#
+#
+# improved list of objects#
+.ls.objects <- function (pos = 1, pattern, order.by,#
+                        decreasing=FALSE, head=FALSE, n=5) {#
+    napply <- function(names, fn) sapply(names, function(x)#
+                                         fn(get(x, pos = pos)))#
+    names <- ls(pos = pos, pattern = pattern)#
+    obj.class <- napply(names, function(x) as.character(class(x))[1])#
+    obj.mode <- napply(names, mode)#
+    obj.type <- ifelse(is.na(obj.class), obj.mode, obj.class)#
+    obj.prettysize <- napply(names, function(x) {#
+                           capture.output(format(utils::object.size(x), units = "auto")) })#
+    obj.size <- napply(names, object.size)#
+    obj.dim <- t(napply(names, function(x)#
+                        as.numeric(dim(x))[1:2]))#
+    vec <- is.na(obj.dim)[, 1] & (obj.type != "function")#
+    obj.dim[vec, 1] <- napply(names, length)[vec]#
+    out <- data.frame(obj.type, obj.size, obj.prettysize, obj.dim)#
+    names(out) <- c("Type", "Size", "PrettySize", "Rows", "Columns")#
+    if (!missing(order.by))#
+        out <- out[order(out[[order.by]], decreasing=decreasing), ]#
+    if (head)#
+        out <- head(out, n)#
+    out#
+}#
+#
+# shorthand#
+lsos <- function(..., n=10) {#
+    .ls.objects(..., order.by="Size", decreasing=TRUE, head=TRUE, n=n)#
+}
+ls()
 #coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
 #primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
 coextNumber_Vieira <- function(imatrix,rlow,rup,nsims){#
@@ -649,232 +460,7 @@ coextNumber_Vieira <- function(imatrix,rlow,rup,nsims){#
   }#
   return(ext_counts)#
 }
-#coextMaxLvl performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and returns how often the extinction sequence ended in each extinction level (i.e. first level, second level, third level, etc.) #
-#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
-coextDeg_Vieira <- function(imatrix,rlow,rup,nsims){#
-  degs <- c()#
-  for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    ranim <- rep(rvalue, nrow(imatrix))#
-    rplants <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }   #
-    profiles <- netcascade_Vieira(imatrix=imatrix,ranim=ranim,rplants=rplants,targetGuild=guild,target=target)#
-    degs[sim] <- max(profiles[[1]]$degree)#
-  }#
-  return(degs)#
-}
-#coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
-#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
-coextNumber_Vieira <- function(imatrix,rlow,rup,nsims){#
-  ext_counts <- c()#
-  for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    ranim <- rep(rvalue, nrow(imatrix))#
-    rplants <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascade_Vieira(imatrix,ranim = ranim, rplants = rplants, targetGuild = guild, target = target)#
-    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
-  }#
-  return(ext_counts)#
-}
-mat_empirical
-extinction_number_Vieira <- list()
-length(mat_empirical)
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
-}
-extinction_number_Vieira
-lapply(extinction_number_Vieira, function(x) sum(which(x > 1)))
-lapply(extinction_number_Vieira, function(x) sum(x > 1))
-do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))
-Vieira_low <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.3, rup = 0.6, nsims = 100)#
-}
-Vieira_med <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.6, rup = 10, nsims = 100)#
-}
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.6, rup = 1, nsims = 100)#
-}
-Vieira_high <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))
-Vieira_low
-Vieira_low/100
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
-}#
-Vieira_low <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100#
-#
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.3, rup = 0.6, nsims = 100)#
-}#
-Vieira_med <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100#
-#
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.6, rup = 1, nsims = 100)#
-}#
-Vieira_high <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100
-set.seed(1)#
-par(mar = c(5,4,1,1))#
-stripchart(#
-  x = list(Vieira_low, Vieira_med, Vieira_high), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 1,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n"#
-  # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
-)
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
-}#
-Vieira_low <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100#
-#
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.3, rup = 0.6, nsims = 100)#
-}#
-Vieira_med <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100#
-#
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.6, rup = 1, nsims = 100)#
-}#
-Vieira_high <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100#
-#
-set.seed(1)#
-par(mar = c(5,4,1,1))#
-stripchart(#
-  x = list(Vieira_low, Vieira_med, Vieira_high), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 1,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n"#
-  # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
-)
-set.seed(1)#
-par(mar = c(5,4,1,1))#
-stripchart(#
-  x = list(Vieira_low, Vieira_med, Vieira_high), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 1,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n", #
-  group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
-)
-set.seed(1)#
-par(mar = c(5,4,1,1))#
-stripchart(#
-  x = list(Vieira_low, Vieira_med, Vieira_high), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 1,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  xaxt = "n", #
-  group.names = c("R{0,0.3}", "R{0.3,0.6}", "R{0.6,1}")#
-)
-set.seed(1)#
-par(mar = c(5,4,1,1))#
-stripchart(#
-  x = list(Vieira_low, Vieira_med, Vieira_high), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 1,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  # xaxt = "n", #
-  group.names = c("R{0,0.3}", "R{0.3,0.6}", "R{0.6,1}")#
-)
-#coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
-#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
-#
-coextNumber_JO <- function(imatrix,rlow,rup,nsims){#
-  ext_counts <- c()#
-  for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    ranim <- rep(rvalue, nrow(imatrix))#
-    rplants <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascade_JO(imatrix,ranim = ranim, rplants = rplants, targetGuild = guild, target = target)#
-    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
-  }#
-  return(ext_counts)#
-}
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
-}#
-JO_low <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100
-#coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
-#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
-#
-coextNumber_JO <- function(imatrix,rlow,rup,nsims){#
-  ext_counts <- c()#
-  for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    ranim <- rep(rvalue, nrow(imatrix))#
-    rplants <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascadeJO(imatrix,ranim = ranim, rplants = rplants, targetGuild = guild, target = target)#
-    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
-  }#
-  return(ext_counts)#
-}
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
-}#
-JO_low <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100
+ls()
 #(December 8 2015).#
 #
 netcascade_JO <- function(#
@@ -1048,184 +634,820 @@ netcascade_JO <- function(#
     return(list(cascade_data = degree_table, rows_species_data = spp_data_rows , cols_species_data = spp_data_cols))#
   }#
 }
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
-}#
-Vieira_low <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100#
-#
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.3, rup = 0.6, nsims = 100)#
-}#
-Vieira_med <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100#
-#
-extinction_number_Vieira <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_Vieira[[i]] <- coextNumber_Vieira(mat_empirical[[i]], rlow = 0.6, rup = 1, nsims = 100)#
-}#
-Vieira_high <- do.call(c, lapply(extinction_number_Vieira, function(x) sum(x > 1)))/100#
-#
-set.seed(1)#
-par(mar = c(5,4,1,1))#
-stripchart(#
-  x = list(Vieira_low, Vieira_med, Vieira_high), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 1,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  # xaxt = "n", #
-  group.names = c("R{0,0.3}", "R{0.3,0.6}", "R{0.6,1}")#
-)
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
-}#
-JO_low <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100
 #coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
 #primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
 #
-coextNumber_JO <- function(imatrix,rlow,rup,nsims){#
+coextNumber_beta <- function(imatrix, nsims, beta_par1_T1 = 1, beta_par2_T1 = 1, beta_par1_T2 = 1, beta_par2_T2 = 1){#
   ext_counts <- c()#
   for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    ranim <- rep(rvalue, nrow(imatrix))#
-    rplants <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('animal','plant'),1,F,c(nrow(imatrix),ncol(imatrix)))#
+    R_rows <- rbeta(n = nrow(imatrix), shape1 = beta_par1_T1, shape2 = beta_par2_T1)#
+    R_cols <- rbeta(n = ncol(imatrix), shape1 = beta_par1_T2, shape2 = beta_par2_T2)#
+    guild <- sample(#
+    				x = c('rows','cols'), #
+    				size = 1, #
+    				replace = FALSE, #
+    				prob = c(nrow(imatrix), ncol(imatrix))#
+    				)#
+    if(guild=="rows"){#
+      target <- rep(1,nrow(imatrix)) #same probability of primary extinction for all spp#
+    }else{#
+      target <- rep(1,ncol(imatrix)) #same probability of primary extinction for all spp#
+    }    #
+    sim_results <- netcascade_JO(#
+    								imatrix = imatrix, #
+    								R_rows = R_rows, #
+    								R_cols = R_cols, #
+    								unluckyGuild = guild, #
+    								unluckySpecies = target, #
+								return.matrix=FALSE#
+    								)#
+    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
+  }#
+  return(ext_counts)#
+}
+#coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
+#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
+#
+coextNumber_beta <- function(imatrix, nsims, beta_par1_T1 = 1, beta_par2_T1 = 1, beta_par1_T2 = 1, beta_par2_T2 = 1){#
+  ext_counts <- c()#
+  for(sim in 1:nsims){#
+    R_rows <- rbeta(n = nrow(imatrix), shape1 = beta_par1_T1, shape2 = beta_par2_T1)#
+    R_cols <- rbeta(n = ncol(imatrix), shape1 = beta_par1_T2, shape2 = beta_par2_T2)#
+    guild <- sample(#
+    				x = c('rows','cols'), #
+    				size = 1, #
+    				replace = FALSE, #
+    				prob = c(nrow(imatrix), ncol(imatrix))#
+    				)#
+    if(guild=="rows"){#
+      target <- rep(1,nrow(imatrix)) #same probability of primary extinction for all spp#
+    }else{#
+      target <- rep(1,ncol(imatrix)) #same probability of primary extinction for all spp#
+    }#
+    sim_results <- netcascade_JO(#
+    								imatrix = imatrix, #
+    								R_rows = R_rows, #
+    								R_cols = R_cols, #
+    								unluckyGuild = guild, #
+    								unluckySpecies = target, #
+								return.matrix=FALSE#
+    								)#
+    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
+  }#
+  return(ext_counts)#
+}
+# Modified from original function 'coextDeg' from Vieira and Almeida-Neto 2014 ECOLET#
+#
+# performs simulations (n = nsims) of the subsequent extinctions following from a primary extinction event in an interaction matrix (imatrix)#
+# returns how often the extinction sequence ended in each extinction level (i.e. first level, second level, third level, etc.) #
+# primary extinctions in each trophic level (e.g. T1 and T2) are drawn from a beta distribution with two shape parameters for each trophic level (beta_par1_T1, beta_par2_T1, beta_par1_T2, beta_par2_T2)#
+coextDeg_beta <- function(imatrix, nsims, beta_par1_T1 = 1, beta_par2_T1 = 1,beta_par1_T2 = 1, beta_par2_T2 = 1){#
+  degs <- c()#
+  for(sim in 1:nsims){#
+    R_rows <- rbeta(n = nrow(imatrix), shape1 = beta_par1_T1, shape2 = beta_par2_T1)#
+    R_cols <- rbeta(n = ncol(imatrix), shape1 = beta_par1_T2, shape2 = beta_par2_T2)#
+    guild <- sample(c('rows','cols'),1,F,c(nrow(imatrix),ncol(imatrix)))#
     if(guild=="animal"){#
-      target <- rep(1,nrow(imatrix))#
+      target <- rep(1,nrow(imatrix)) #same probability of primary extinction for all spp#
     }else{#
-      target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascade_JO(imatrix = imatrix, R_rows = ranim, R_cols = rplants, unluckyGuild = guild, unluckySpecies = target)#
-    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
+      target <- rep(1,ncol(imatrix)) #same probability of primary extinction for all spp#
+    }#
+    profiles <- netcascade_JO(#
+							imatrix = imatrix, #
+							R_rows = R_rows, #
+							R_cols = R_cols, #
+							unluckyGuild = guild, #
+							unluckySpecies = target, #
+							return.matrix=FALSE#
+							)#
+    degs[sim] <- max(profiles[[1]]$degree)#
   }#
-  return(ext_counts)#
-}
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
-}
+  return(degs)#
+}#
+# GRAVEYARD:#
+   	# sample R values from a distribution set by user#
+   	# dist_options <- c("normal", "exponential", "uniform")#
+   	# TODO add a warning later#
+   	# if(!(dist %in% dist_options))#
+    		# stop("argument 'dist' must be one of the following: ", dist_options)#
+    	# if(distr == "normal"){    		#
+    		# dist_call <- rnorm    		#
+    	# } else if(distr == "exponential"){    		#
+    		# dist_call <- rexp#
+    	# } else if(distr == "uniform"){    		#
+    		# dist_call <- runif#
+    	# }
 #coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
 #primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
 #
-coextNumber_JO <- function(imatrix,rlow,rup,nsims){#
+coextNumber_beta <- function(imatrix, nsims, beta_par1_T1 = 1, beta_par2_T1 = 1, beta_par1_T2 = 1, beta_par2_T2 = 1){#
   ext_counts <- c()#
   for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    ranim <- rep(rvalue, nrow(imatrix))#
-    rplants <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('rows','cols'),1,F,c(nrow(imatrix),ncol(imatrix)))#
+    R_rows <- rbeta(n = nrow(imatrix), shape1 = beta_par1_T1, shape2 = beta_par2_T1)#
+    R_cols <- rbeta(n = ncol(imatrix), shape1 = beta_par1_T2, shape2 = beta_par2_T2)#
+    guild <- sample(#
+    				x = c('rows','cols'), #
+    				size = 1, #
+    				replace = FALSE, #
+    				prob = c(nrow(imatrix), ncol(imatrix))#
+    				)#
     if(guild=="rows"){#
-      target <- rep(1,nrow(imatrix))#
+      target <- rep(1,nrow(imatrix)) #same probability of primary extinction for all spp#
     }else{#
-      target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascade_JO(imatrix = imatrix, R_rows = ranim, R_cols = rplants, unluckyGuild = guild, unluckySpecies = target)#
+      target <- rep(1,ncol(imatrix)) #same probability of primary extinction for all spp#
+    }#
+    sim_results <- netcascade_JO(#
+    								imatrix = imatrix, #
+    								R_rows = R_rows, #
+    								R_cols = R_cols, #
+    								unluckyGuild = guild, #
+    								unluckySpecies = target, #
+								return.matrix=FALSE#
+    								)#
     ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
   }#
   return(ext_counts)#
 }
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
+beta.par <- matrix(c(0.1, 1, 0.5, 1, 1, 1, 3, 3, 4, 0.1, 0.2, 0.2), byrow = TRUE, ncol = 2)#
+rownames(beta.par)=c("exp","power","unif","normal","left", "bimod")#
+R_options <- c("VA_low", "VA_med", "VA_high", rownames(beta.par))
+beta.bar
+beta.par
+setwd("/Users/threeprime/Dropbox/NIMBioS_END/extinctions/Analysis")
+# point to the data directory#
+data_dir <- file.path("..", "Data")#
+#
+# point to the figure directory to write figures#
+fig_dir <- file.path("..", "Figures")#
+#
+# load the functions#
+sapply(list.files(pattern="[.]R$", path="functions/", full.names=TRUE), source)#
+# source("functions/netcascade_JO.R")#
+# source("functions/extinction_cascader.R")#
+# path to directory containing empirical networks:#
+emp_net_path <- file.path(data_dir, "nets_emp")#
+# load all networks in that directory#
+emp_net_files <- dir(path = emp_net_path) #Plant-pollinator weighted nets#
+emp_nets <- list()#
+for(p in 1:length(emp_net_files)){#
+	emp_nets[[p]] <- as.matrix(read.table(file.path(emp_net_path, emp_net_files[p])))#
+}#
+# NCEAS IWDB pollination networks#
+poll_net_path <- file.path(data_dir, "NCEAS_text_files/plant_pollinator")#
+# skip "kevan_f.txt"#
+poll_net_files <- dir(path = poll_net_path)#
+poll_net_files <- poll_net_files[!poll_net_files == "kevan_f.txt"]#
+poll_nets <- list()#
+for(p in 1:length(poll_net_files)){#
+	print(p)#
+	poll_nets[[p]] <- as.matrix(read.table(file.path(poll_net_path, poll_net_files[p])))#
+}#
+#
+# NCEAS IWDB seed disperser networks#
+seed_net_path <- file.path(data_dir, "NCEAS_text_files/seed_disperser")#
+seed_net_files <- dir(path = seed_net_path) #Plant-pollinator weighted nets#
+seed_nets <- list()#
+for(p in 1:length(seed_net_files)){#
+	seed_nets[[p]] <- as.matrix(read.table(file.path(seed_net_path, seed_net_files[p])))#
 }
-JO_low <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0, rup = 0.3, nsims = 100)#
+mat_empirical <- poll_nets#
+mat_empirical <- c(poll_nets, seed_nets)
+mat_empirical <- mat_empirical[which(sapply(mat_empirical, is.numeric))]
+length(mat_empirical) # 32
+test_matrix <- matrix(#
+			data = round(rnorm(n = 24, mean = 20, sd = 5)), #
+			nrow = 4#
+)#
+# imatrix <- MAT#
+# R_rows <- runif(n = nrow(MAT))#
+# R_cols <- runif(n = ncol(MAT))#
+# unluckyGuild <- "rows"#
+# unluckySpecies <- 2#
+# extinct_cols=NULL #
+# extinct_rows=NULL#
+# return.matrix=FALSE
+test_matrix
+rowSums(test_matrix)
+prune_absent <- function(this_mat){#
+	this_mat[which(rowSums(this_mat) == 0) , ] <- NULL#
+	this_mat[ , which(colSums(this_mat) == 0)] <- NULL#
+	return(this_mat)#
+}
+plot(sort(rexp(100, rate = 1)))
+plot(sort(rexp(100, rate = 1)), decreasing = TRUE)
+plot(sort(rexp(100, rate = 1), decreasing = TRUE))
+rexp(100, rate = 1)
+rexp(100, rate = 100)
+plot(sort(rexp(100, rate = 0.1), decreasing = TRUE))
+rexp(100, rate = 0.1)
+rexp(100, rate = 0.01)
+log(rnorm(100, mean = 20, sd = 1))
+plot(sort(rexp(100, rate = 0.01), decreasing = TRUE))
+rexp(100, rate = 0.01)
+plot(sort(rexp(100, rate = 0.1), decreasing = TRUE))
+?binom
+?rbinom
+rbinom(n = 1, size = 10, prob = 0.5)
+rbinom(n = 10, size = 10, prob = 0.5)
+rbinom(n = 10, size = 2, prob = 0.5)
+rbinom(n = 10, size = 1, prob = 0.5)
+rbinom(n = 10, size = 1, prob = 0.5)
+rbinom(n = 100, size = 1, prob = 0.2)
+test_matrix <- matrix(data = rbinom(n = 100, size = 1, prob = 0.2), nrow = 10)
+test_matrix
+rowSums(test_matrix)
+colSums(test_matrix)
+plot(sort(rexp(100, rate = 0.1), decreasing = TRUE))
+dim(test_matrix)
+rowSums(test_matrix)
+colSums(test_matrix)
+prune_absent(test_matrix)
+this_mat <- test_matrix
+rowSums(this_mat)
+which(rowSums(this_mat) == 0)
+this_mat[which(rowSums(this_mat) == 0) , ]
+this_mat[ , which(colSums(this_mat) == 0)]
+this_mat[which(rowSums(this_mat) == 0) , ] <- NULL
+this_mat[which(rowSums(this_mat) != 0) , ]
+this_mat <- this_mat[which(rowSums(this_mat) != 0) , ]
+this_mat
+rowSums(this_mat)
+rm(this_mat)
+prune_absent <- function(this_mat){#
+	this_mat <- this_mat[which(rowSums(this_mat) != 0) , ]#
+	this_mat <- this_mat[ , which(colSums(this_mat) != 0)]#
+	return(this_mat)#
 }#
-JO_low <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100#
+test_matrix <- matrix(data = rbinom(n = 100, size = 1, prob = 0.2), nrow = 10)#
 #
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0.3, rup = 0.6, nsims = 100)#
+dim(test_matrix)#
+#
+rowSums(test_matrix)#
+colSums(test_matrix)
+prune_absent(test_matrix)
+rowSums(prune_absent(test_matrix))
+colSums(prune_absent(test_matrix))
+colSums(prune_absent(test_matrix))
+dim(prune_absent(test_matrix))
+dim(test_matrix)
+lapply(mat_empirical, prune_absent)
+sapply(lapply(mat_empirical, prune_absent), ncol)
+sapply(mat_empirical, ncol)
+sapply(lapply(mat_empirical, prune_absent), nrow)
+length(lapply(mat_empirical, prune_absent))
+# First, you must set your working directory to extinctions/Analysis#
+#
+# point to the data directory#
+data_dir <- file.path("..", "Data")#
+#
+# point to the figure directory to write figures#
+fig_dir <- file.path("..", "Figures")#
+#
+# load the functions#
+sapply(list.files(pattern="[.]R$", path="functions/", full.names=TRUE), source)#
+# source("functions/netcascade_JO.R")#
+# source("functions/extinction_cascader.R")#
+# path to directory containing empirical networks:#
+emp_net_path <- file.path(data_dir, "nets_emp")#
+# load all networks in that directory#
+emp_net_files <- dir(path = emp_net_path, pattern = "*.txt") #Plant-pollinator weighted nets#
+emp_nets <- list()#
+for(p in 1:length(emp_net_files)){#
+	emp_nets[[p]] <- as.matrix(read.table(file.path(emp_net_path, emp_net_files[p])))#
+}
+emp_nets
+# point to the data directory#
+data_dir <- file.path("..", "Data")#
+#
+# point to the figure directory to write figures#
+fig_dir <- file.path("..", "Figures")#
+#
+# load the functions#
+sapply(list.files(pattern="[.]R$", path="functions/", full.names=TRUE), source)#
+# source("functions/netcascade_JO.R")#
+# source("functions/extinction_cascader.R")#
+# path to directory containing empirical networks:#
+emp_net_path <- file.path(data_dir, "nets_emp")#
+# load all networks in that directory#
+emp_net_files <- dir(path = emp_net_path, pattern = "*.txt") #Plant-pollinator weighted nets#
+emp_nets <- list()#
+for(p in 1:length(emp_net_files)){#
+	emp_nets[[p]] <- as.matrix(read.table(file.path(emp_net_path, emp_net_files[p])))#
 }#
-JO_med <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100#
-#
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0.6, rup = 1, nsims = 100)#
+# NCEAS IWDB pollination networks#
+poll_net_path <- file.path(data_dir, "NCEAS_text_files/plant_pollinator")#
+# skip "kevan_f.txt"#
+poll_net_files <- dir(path = poll_net_path, pattern = "*.txt")#
+poll_net_files <- poll_net_files[!poll_net_files == "kevan_f.txt"] # this file is not square (has a row with not enough columns)#
+poll_nets <- list()#
+for(p in 1:length(poll_net_files)){#
+	print(p)#
+	poll_nets[[p]] <- as.matrix(read.table(file.path(poll_net_path, poll_net_files[p])))#
 }#
-JO_high <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100
-set.seed(1)#
-par(mar = c(5,4,1,1))#
-stripchart(#
-  x = list(JO_low, JO_med, JO_high), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 1,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  # xaxt = "n", #
-  group.names = c("R{0,0.3}", "R{0.3,0.6}", "R{0.6,1}")#
-)
-#coextNumber performs simulations (n = nsims) of a single episode of primary extinction and its possible associated coextinction cascade and creates a frequency distribution for the total number of extinctions for each episode.#
-#primary extinctions are uniform random among both groups.'r' is sampled from a interval (rlow, rup)#
 #
-coextNumber_JO <- function(imatrix,rlow,rup,nsims){#
-  ext_counts <- c()#
-  for(sim in 1:nsims){#
-    rvalue <- runif(1,rlow,rup)#
-    R_rows <- rep(rvalue, nrow(imatrix))#
-    R_cols <- rep(rvalue, ncol(imatrix))#
-    guild <- sample(c('rows','cols'),1,F,c(nrow(imatrix),ncol(imatrix)))#
-    if(guild=="rows"){#
-      target <- rep(1,nrow(imatrix))#
-    }else{#
-      target <- rep(1,ncol(imatrix))#
-    }    #
-    sim_results <- netcascade_JO(imatrix = imatrix, R_rows = R_rows, R_cols = R_cols, unluckyGuild = guild, unluckySpecies = target)#
-    ext_counts[sim] <- sum(sim_results[[1]]$n_extinctions)#
+# NCEAS IWDB seed disperser networks#
+seed_net_path <- file.path(data_dir, "NCEAS_text_files/seed_disperser")#
+seed_net_files <- dir(path = seed_net_path, pattern = "*.txt") #
+seed_nets <- list()#
+for(p in 1:length(seed_net_files)){#
+	seed_nets[[p]] <- as.matrix(read.table(file.path(seed_net_path, seed_net_files[p])))#
+}#
+#
+# NCEAS IWDB seed disperser networks#
+antplant_net_path <- file.path(data_dir, "NCEAS_text_files/ant_plant")#
+antplant_net_files <- dir(path = antplant_net_path, pattern = "*.txt") #
+antplant_nets <- list()#
+for(p in 1:length(antplant_net_files)){#
+	antplant_nets[[p]] <- as.matrix(read.table(file.path(antplant_net_path, antplant_net_files[p])))#
+}
+# NCEAS IWDB seed disperser networks#
+antplant_net_path <- file.path(data_dir, "NCEAS_text_files/ant_plant")#
+antplant_net_files <- dir(path = antplant_net_path, pattern = "*.txt") #
+antplant_nets <- list()#
+for(p in 1:length(antplant_net_files)){#
+	antplant_nets[[p]] <- as.matrix(read.table(file.path(antplant_net_path, antplant_net_files[p])))#
+}
+# point to the data directory#
+data_dir <- file.path("..", "Data")#
+#
+# point to the figure directory to write figures#
+fig_dir <- file.path("..", "Figures")#
+#
+# load the functions#
+sapply(list.files(pattern="[.]R$", path="functions/", full.names=TRUE), source)#
+# source("functions/netcascade_JO.R")#
+# source("functions/extinction_cascader.R")#
+# path to directory containing empirical networks:#
+emp_net_path <- file.path(data_dir, "nets_emp")#
+# load all networks in that directory#
+emp_net_files <- dir(path = emp_net_path, pattern = "*.txt") #Plant-pollinator weighted nets#
+emp_nets <- list()#
+for(p in 1:length(emp_net_files)){#
+	emp_nets[[p]] <- as.matrix(read.table(file.path(emp_net_path, emp_net_files[p])))#
+}#
+# NCEAS IWDB pollination networks#
+poll_net_path <- file.path(data_dir, "NCEAS_text_files/plant_pollinator")#
+# skip "kevan_f.txt"#
+poll_net_files <- dir(path = poll_net_path, pattern = "*.txt")#
+poll_net_files <- poll_net_files[!poll_net_files == "kevan_f.txt"] # this file is not square (has a row with not enough columns)#
+poll_nets <- list()#
+for(p in 1:length(poll_net_files)){#
+	poll_nets[[p]] <- as.matrix(read.table(file.path(poll_net_path, poll_net_files[p])))#
+}#
+#
+# NCEAS IWDB seed disperser networks#
+seed_net_path <- file.path(data_dir, "NCEAS_text_files/seed_disperser")#
+seed_net_files <- dir(path = seed_net_path, pattern = "*.txt") #
+seed_nets <- list()#
+for(p in 1:length(seed_net_files)){#
+	seed_nets[[p]] <- as.matrix(read.table(file.path(seed_net_path, seed_net_files[p])))#
+}#
+#
+# NCEAS IWDB seed disperser networks#
+antplant_net_path <- file.path(data_dir, "NCEAS_text_files/ant_plant")#
+antplant_net_files <- dir(path = antplant_net_path, pattern = "*.txt") #
+antplant_nets <- list()#
+for(p in 1:length(antplant_net_files)){#
+	antplant_nets[[p]] <- as.matrix(read.table(file.path(antplant_net_path, antplant_net_files[p])))#
+}
+mat_empirical <- c(emp_nets, poll_nets, seed_nets, antplant_nets)
+length(mat_empirical) # 32 (+5 seed)
+mat_empirical[#
+	which(#
+		sapply(#
+			mat_empirical, #
+			max#
+		) < 2#
+	)#
+] <- NULL#
+length(mat_empirical) # 11 (+3 seed)
+mat_empirical <- c(emp_nets, poll_nets, seed_nets, antplant_nets)
+mat_empirical <- c(poll_nets, seed_nets, antplant_nets)
+length(mat_empirical) # 32 (+5 seed; 51 for all)
+mat_empirical <- c(poll_nets, seed_nets, antplant_nets)#
+# mat_empirical <- poll_nets#
+#
+length(mat_empirical) # 42 for all
+mat_empirical <- mat_empirical[which(sapply(mat_empirical, is.numeric))]
+length(mat_empirical)
+mat_empirical
+mat_empirical[#
+	which(#
+		sapply(#
+			mat_empirical, #
+			max#
+		) < 2#
+	)#
+] <- NULL#
+length(mat_empirical) # 11 (+3 seed)
+# remove rows or columns that doesn't interact with anyone #
+# this function will remove species that do not have any interactions#
+prune_absent <- function(this_mat){#
+	this_mat <- this_mat[which(rowSums(this_mat) != 0) , ]#
+	this_mat <- this_mat[ , which(colSums(this_mat) != 0)]#
+	return(this_mat)#
+}
+length(lapply(mat_empirical, prune_absent))
+length(mat_empirical) # 11 (+3 seed)
+prune_absent <- function(this_mat){#
+	this_mat <- this_mat[which(rowSums(this_mat) != 0) , ]#
+	this_mat <- this_mat[ , which(colSums(this_mat) != 0)]#
+	return(this_mat)#
+}#
+#
+length(lapply(mat_empirical, prune_absent))
+mat_empirical
+length(mat_empirical) # 11 (+3 seed)
+# remove rows or columns that doesn't interact with anyone #
+# this function will remove species that do not have any interactions#
+prune_absent <- function(this_mat){#
+	this_mat <- this_mat[which(rowSums(this_mat) != 0) , ]#
+	this_mat <- this_mat[ , which(colSums(this_mat) != 0)]#
+	return(this_mat)#
+}#
+#
+length(lapply(mat_empirical, prune_absent))
+lapply(mat_empirical, prune_absent)
+sapply(lapply(mat_empirical, prune_absent), rowSums)
+mat_empirical <- lapply(mat_empirical, prune_absent)
+length(mat_empirical)
+length(mat_empirical) # 22 (+3 seed)
+beta.par <- matrix(c(0.1, 1, 0.5, 1, 1, 1, 3, 3, 4, 0.1, 0.2, 0.2), byrow = TRUE, ncol = 2)#
+rownames(beta.par)=c("exp","power","unif","normal","left", "bimod")#
+R_options <- c("VA_low", "VA_med", "VA_high", rownames(beta.par))#
+#
+R_by_guild <- expand.grid(R_options, R_options)#
+#
+R_combo_names <- apply(X = as.matrix(R_by_guild), MARGIN = 1, FUN = function(x) paste(x, sep = "", collapse = ""))#
+############################################################
+#------------- RUN THE SIMULATIONS#
+############################################################
+N_iterations <- 10#
+#
+R_combo_out <- list()#
+#
+for(Rcombo in 1:nrow(R_by_guild)){#
+	current_Rrows <- as.character(R_by_guild[Rcombo,1])#
+	current_Rcols <- as.character(R_by_guild[Rcombo,2])#
+	# DO THE SIMULATIONS ON EACH NETWORK#
+	stored_events <- list()#
+	just_extinctions <- list()#
+	extinctions_by_guild <- list()#
+	total_extinctions <- list()#
+	total_cascades <- list()#
+	cascade_frequency <- list()#
+	for(i in 1:length(mat_empirical)){#
+		mat <- mat_empirical[[i]]#
+		if(min(c(rowSums(mat), colSums(mat))) == 0){#
+			print("Hey, you have a species in your network that does not interact with any other species. The following functions will get stuck.")#
+			next()#
+		}#
+		m<-nrow(mat)#
+		n<-ncol(mat)#
+		stored_events[[i]] <- extinction_cascader(imatrix = mat, R_row = current_Rrows, R_col = current_Rcols, nsims = N_iterations)#
+		just_extinctions[[i]] <- lapply(stored_events[[i]], "[", c("lost_cols", "lost_rows"))#
+		extinctions_by_guild[[i]] <- do.call(rbind, lapply(just_extinctions[[i]], lengths))#
+		total_extinctions[[i]] <- rowSums(extinctions_by_guild[[i]])#
+		total_cascades[[i]] <- sum(total_extinctions[[i]] > 1)#
+		cascade_frequency[[i]] <- total_cascades[[i]]/length(stored_events[[i]])#
+	}#
+#
+	R_combo_out[[Rcombo]] <- list(stored_events = stored_events, just_extinctions = just_extinctions, extinctions_by_guild = extinctions_by_guild, total_extinctions = total_extinctions, total_cascades = total_cascades, cascade_frequency = cascade_frequency)#
+#
+}#
+names(R_combo_out) <- R_combo_names
+lsos() # memory checking function
+R_combo_names[1]
+R_combo_names[4]
+plot_list()#
+for(i in 1:length(R_combo_out)){#
+    plot_list[[i]] <- do.call(c, R_combo_out[[i]][[6]])#
+    names(plot_list)[i] <- R_combo_names[i]  #
+}
+plot_list() <- list()#
+for(i in 1:length(R_combo_out)){#
+    plot_list[[i]] <- do.call(c, R_combo_out[[i]][[6]])#
+    names(plot_list)[i] <- R_combo_names[i]  #
+}
+plot_list <- list()#
+for(i in 1:length(R_combo_out)){#
+    plot_list[[i]] <- do.call(c, R_combo_out[[i]][[6]])#
+    names(plot_list)[i] <- R_combo_names[i]  #
+}
+plot_list
+names(R_combo_out[[1]])
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print(batch)#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batches]]))#
+  	print(i)#
+}
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print(batch)#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batch]]))#
+  	print(i)#
+}
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print("batch")#
+  print(batch)#
+  print("batches[[batch]]")#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batch]]))#
+	print("batches[[batch]]")#
+  	print(i)#
+}
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print("batch")#
+  print(batch)#
+  print("batches[[batch]]")#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batch]]))#
+  	print("i")#
+  	print(i)#
+}
+names(plot_list[[i]])
+names(plot_list[i])
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print("batch")#
+  print(batch)#
+  print("batches[[batch]]")#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batch]]))#
+  	print("i")#
+  	print(i)#
+  	names(plot_list[i])#
+}
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print("batch")#
+  print(batch)#
+  print("batches[[batch]]")#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batch]])){#
+  	print("i")#
+  	print(batches[[batch]][i])#
+  	names(plot_list[i])#
   }#
-  return(ext_counts)#
 }
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0.3, rup = 0.6, nsims = 100)#
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print("batch")#
+  print(batch)#
+  print("batches[[batch]]")#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batch]])){#
+  	print("i")#
+  	print(batches[[batch]][i])#
+  	names(plot_list[i])#
+  set.seed(1)#
+  par(mar = c(5,4,1,1))#
+  stripchart(#
+    x = plot_list[[batches[[batch]]]], #
+    vertical = TRUE,#
+    method = "jitter",#
+    jitter = 0.2,#
+    pch = 1, col = "black", #bg = "grey",#
+    cex = 0.8,#
+    # las = 2,#
+    ylab = "Cascade frequency",#
+    ylim = c(0,1),#
+    las = 2, #
+    xaxt = "n"#
+    # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
+  )#
+  }#
+}
+plot_list[1]
+plot_list[[1]]
+batches[[1]]
+plot_list
+plot_list[[batches[1:9]]]
+plot_list[[batches[1]]]
+plot_list[[batches[[1]]]]
+batches[[1]]
+plot_list[[1:2]]
+plot_list[1:2]
+plot_list[c(1,2,3,5)]
+plot_list[batches[[1]]]
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print("batch")#
+  print(batch)#
+  print("batches[[batch]]")#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batch]])){#
+  	print("i")#
+  	print(batches[[batch]][i])#
+  	names(plot_list[i])#
+  set.seed(1)#
+  par(mar = c(5,4,1,1))#
+  stripchart(#
+    x = plot_list[batches[[batch]]], #
+    vertical = TRUE,#
+    method = "jitter",#
+    jitter = 0.2,#
+    pch = 1, col = "black", #bg = "grey",#
+    cex = 0.8,#
+    # las = 2,#
+    ylab = "Cascade frequency",#
+    ylim = c(0,1),#
+    las = 2, #
+    xaxt = "n"#
+    # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
+  )#
+  }#
+}
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  print("batch")#
+  print(batch)#
+  print("batches[[batch]]")#
+  print(batches[[batch]])#
+  for(i in 1:length(batches[[batch]])){#
+  	print("i")#
+  	print(batches[[batch]][i])#
+  	names(plot_list[i])#
+  set.seed(1)#
+  par(mar = c(5,4,1,1))#
+  stripchart(#
+    x = plot_list[batches[[batch]]], #
+    vertical = TRUE,#
+    method = "jitter",#
+    jitter = 0.2,#
+    pch = 1, col = "black", #bg = "grey",#
+    cex = 0.8,#
+    # las = 2,#
+    ylab = "Cascade frequency",#
+    ylim = c(0,1),#
+    las = 2, #
+    xaxt = "n"#
+    # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
+  )#
+    # add axis#
+  axis(#
+    side = 1,#
+    at = 1:length(plot_list),#
+    tick = TRUE,#
+    labels = FALSE, #
+    line = 0#
+  )#
+  # add labels#
+  text(#
+    x = 1:length(plot_list), #
+    y = -0.1, #
+    labels = names(plot_list), #
+    xpd = TRUE, #
+    srt = 45, #
+    pos = 2, #
+    cex = 0.8#
+    )#
+#
+  }#
+}
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  # print("batch")#
+  # print(batch)#
+  # print("batches[[batch]]")#
+  # print(batches[[batch]])#
+  # for(i in 1:length(batches[[batch]])){#
+  	# print("i")#
+  	# print(batches[[batch]][i])#
+  	# names(plot_list[i])#
+  set.seed(1)#
+  par(mar = c(5,4,1,1))#
+  stripchart(#
+    x = plot_list[batches[[batch]]], #
+    vertical = TRUE,#
+    method = "jitter",#
+    jitter = 0.2,#
+    pch = 1, col = "black", #bg = "grey",#
+    cex = 0.8,#
+    # las = 2,#
+    ylab = "Cascade frequency",#
+    ylim = c(0,1),#
+    las = 2, #
+    xaxt = "n"#
+    # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
+  )#
+    # add axis#
+  axis(#
+    side = 1,#
+    at = 1:length(plot_list),#
+    tick = TRUE,#
+    labels = FALSE, #
+    line = 0#
+  )#
+  # add labels#
+  text(#
+    x = 1:length(plot_list), #
+    y = -0.1, #
+    labels = names(plot_list), #
+    xpd = TRUE, #
+    srt = 45, #
+    pos = 2, #
+    cex = 0.8#
+    )#
+#
+  # }#
+}
+names(plot_list[1:9])
+plot_list[1:9]
+names(plot_list[1:9])
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  # print("batch")#
+  # print(batch)#
+  # print("batches[[batch]]")#
+  # print(batches[[batch]])#
+  # for(i in 1:length(batches[[batch]])){#
+  	# print("i")#
+  	# print(batches[[batch]][i])#
+  	# names(plot_list[i])#
+  set.seed(1)#
+  par(mar = c(5,4,1,1))#
+  stripchart(#
+    x = plot_list[batches[[batch]]], #
+    vertical = TRUE,#
+    method = "jitter",#
+    jitter = 0.2,#
+    pch = 1, col = "black", #bg = "grey",#
+    cex = 0.8,#
+    # las = 2,#
+    ylab = "Cascade frequency",#
+    ylim = c(0,1),#
+    las = 2, #
+    xaxt = "n"#
+    # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
+  )#
+    # add axis#
+  axis(#
+    side = 1,#
+    at = 1:length(plot_list[batches[[batch]]]),#
+    tick = TRUE,#
+    labels = FALSE, #
+    line = 0#
+  )#
+  # add labels#
+  text(#
+    x = 1:length(plot_list[batches[[batch]]]), #
+    y = -0.1, #
+    labels = names(plot_list[batches[[batch]]]), #
+    xpd = TRUE, #
+    srt = 45, #
+    pos = 2, #
+    cex = 0.8#
+    )#
+#
+  # }#
+}
+pdf(file = file.path(fig_dir, "cascade_freq_by_R_full.pdf"), width = 12, height = 7)#
+batches <- list(1:9, 10:18, 19:27, 28:36, 37:45, 46:54, 55:63, 64:72, 73:81)#
+for(batch in 1:length(batches)){#
+  set.seed(1)#
+  par(mar = c(5,4,1,1))#
+  stripchart(#
+    x = plot_list[batches[[batch]]], #
+    vertical = TRUE,#
+    method = "jitter",#
+    jitter = 0.2,#
+    pch = 1, col = "black", #bg = "grey",#
+    cex = 0.8,#
+    # las = 2,#
+    ylab = "Cascade frequency",#
+    ylim = c(0,1),#
+    las = 2, #
+    xaxt = "n"#
+    # group.names = c("within tags,\nsingle PCR", "between tags,\nsingle PCR", "within tags,\ndouble PCR", "between tags,\ndouble PCR")#
+  )#
+    # add axis#
+  axis(#
+    side = 1,#
+    at = 1:length(plot_list[batches[[batch]]]),#
+    tick = TRUE,#
+    labels = FALSE, #
+    line = 0#
+  )#
+  # add labels#
+  text(#
+    x = 1:length(plot_list[batches[[batch]]]), #
+    y = -0.1, #
+    labels = names(plot_list[batches[[batch]]]), #
+    xpd = TRUE, #
+    srt = 45, #
+    pos = 2, #
+    cex = 0.8#
+    )#
+#
 }#
-JO_med <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100#
 #
-extinction_number_JO <- list()#
-for(i in 1:length(mat_empirical)){#
-	extinction_number_JO[[i]] <- coextNumber_JO(mat_empirical[[i]], rlow = 0.6, rup = 1, nsims = 100)#
-}#
-JO_high <- do.call(c, lapply(extinction_number_JO, function(x) sum(x > 1)))/100#
-#
-set.seed(1)#
-par(mar = c(5,4,1,1))#
-stripchart(#
-  x = list(JO_low, JO_med, JO_high), #
-  vertical = TRUE,#
-  method = "jitter",#
-  jitter = 0.2,#
-  pch = 1, col = "black", #bg = "grey",#
-  cex = 1,#
-  # las = 2,#
-  ylab = "Cascade frequency",#
-  ylim = c(0,1),#
-  # xaxt = "n", #
-  group.names = c("R{0,0.3}", "R{0.3,0.6}", "R{0.6,1}")#
-)
-boxplot(count ~ spray, data = InsectSprays, outpch = NA) #
-stripchart(count ~ spray, data = InsectSprays, #
-            vertical = TRUE, method = "jitter", #
-            pch = 21, col = "maroon", bg = "bisque", #
-            add = TRUE)
-# Plot dots (a stripchart) over boxplot#
-#
-# source http://r.789695.n4.nabble.com/overlap-dot-plots-with-box-plots-td2134530.html#
-#
-boxplot(count ~ spray, data = InsectSprays, outpch = NA) #
-stripchart(count ~ spray, data = InsectSprays, #
-            vertical = TRUE, method = "jitter", #
-            pch = 21, col = "maroon", bg = "bisque", #
-            add = TRUE) #
-#
-# (Setting 'outpch = NA' avoids plotting outliers.)
+dev.off()
+apply(X = as.matrix(R_by_guild), MARGIN = 1, FUN = function(x) paste(x, sep = "-", collapse = ""))
+apply(X = as.matrix(R_by_guild), MARGIN = 1, FUN = function(x) paste(x, sep = "-", collapse = "-"))
+apply(X = as.matrix(R_by_guild), MARGIN = 1, FUN = function(x) paste(x, sep = "", collapse = "-"))

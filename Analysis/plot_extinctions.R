@@ -1,12 +1,19 @@
 set.seed(1)
 par(mar = c(5,4,1,1))
 stripchart(
-  x = list(Vieira_low, Vieira_med, Vieira_high), 
+  x = list(
+  	freq_VAlow, 
+  	freq_VAmed, 
+  	freq_VAhigh, 
+  	freq_VAhilo, 
+  	freq_leftleft, 
+  	freq_unifunif
+  	), 
   vertical = TRUE,
   method = "jitter",
   jitter = 0.2,
   pch = 1, col = "black", #bg = "grey",
-  cex = 1,
+  cex = 0.8,
   # las = 2,
   ylab = "Cascade frequency",
   ylim = c(0,1),
