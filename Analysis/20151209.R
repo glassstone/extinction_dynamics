@@ -139,7 +139,7 @@ R_combo_df <- cbind(R_scenario, R_scenario)
 # this *perhaps?* indicates that variation AMONG species is not important.
 # That is, it doesn't matter whether ONE species has a high R, or they ALL do.
 # Thus, even a few obligate mutualists make a network more prone to an extinction cascade.
-# W
+# 
 
 
 
