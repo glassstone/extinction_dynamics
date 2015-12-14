@@ -16,7 +16,7 @@ source("functions/netcascade.R")
 # 0.1 and 1 gives exponential-like distribution;
 # 0.5 and 1 gives Pareto-like ("power-law") distribution
 # 1 and 1 give uniform-like distribution
-# 3 and 3 give normal-like distribution
+# 8 and 8 give normal-like distribution
 # 4 and 0.1 give a left skewed distribution
 # 0.2 and 0.2 give a bimodal distribution
 
