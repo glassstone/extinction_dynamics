@@ -101,7 +101,7 @@ netcascade_JO <- function(
 	} else if(R_rows == "bimod"){
 		R_val_row <- rbeta(nrow(imatrix), shape1 = beta.par["bimod", 1], shape2 = beta.par["bimod", 2])
 	} else if(is.numeric(R_rows)){
-		if( max(R_rows) > 1 || min(R_cols) < 0 ){
+		if( max(R_rows) > 1 || min(R_rows) < 0 ){
 			stop("numeric inputs for 'R_rows' must be between 0 and 1")
 		} else if(length(R_rows) == 1){
 			R_val_row <- rep(R_rows, nrow(imatrix))
@@ -148,13 +148,13 @@ netcascade_JO <- function(
 
 
 
-  #----------CALCULATING DEPENDENCE MATRICES-------------------
-  M <- array(0,dim=c(nrows,ncols,2))
+  #----------CALCULATING INTERACTION STRENGTH MATRICES-------------------
+  interaction_strength <- array(0,dim=c(nrows,ncols,2))
   for(i in 1:ncols){
-    M[,i,1] <- imatrix[,i]/sum(imatrix[,i])
+    interaction_strength[,i,1] <- imatrix[,i]/sum(imatrix[,i])
   } #matrix of columns' dependence on each row
   for(i in 1:nrows){
-    M[i,,2] <- imatrix[i,]/sum(imatrix[i,])
+    interaction_strength[i,,2] <- imatrix[i,]/sum(imatrix[i,])
   } #matrix of rows' dependence on each column
 
 
@@ -179,33 +179,35 @@ netcascade_JO <- function(
   #-----------CHOOSING TARGET SPECIES FOR PRIMARY EXTINCTION---
   coext_rows <- c()
   coext_cols <- c()
-  if(length(unluckySpecies)==1){
-    if(unluckyGuild=="rows"){
-      if(unluckySpecies %in% extinct_rows){stop('Specified target species for the primary extinction is already extinct')}
-      coext_rows <- unluckySpecies
-      degree_when_lost_rows <- 1 #stores the degree of the extinction event of every row lost during the coextinction cascade.
-    }
-    if(unluckyGuild=="cols"){
-      if(unluckySpecies %in% extinct_cols){stop('Specified target species for the primary extinction is already extinct')}
-      coext_cols <- unluckySpecies
-      degree_when_lost_cols <- 1
-    }
-  }else{
-    nspecies <- switch(unluckyGuild, rows = nrows, cols = ncols)
-    if(length(unluckySpecies)==nspecies){
-      if(unluckyGuild =="rows"){
-        alive <- rows[is.na(rowsNA)==FALSE]
-        coext_rows <- sample(c(alive,0),1,prob = c(unluckySpecies[is.na(rowsNA)==FALSE],0))
-        degree_when_lost_rows <- 1
-      }
-      if(unluckyGuild =="cols"){
-        alive <- cols[is.na(colsNA)==FALSE]
-        coext_cols <- sample(c(alive,0),1,prob = c(unluckySpecies[is.na(colsNA)==FALSE],0))
-        degree_when_lost_cols <- 1
-      }
-    }else{
-      stop('Length of "unluckySpecies" must be 1 (specifying a single species within the unlucky guild) or else be equal to the number of species in the unlucky guild (specifying probabilities of primary extinction for each species in the unlucky guild)')
-    }
+  if(is.numeric(unluckySpecies)){
+	  if(length(unluckySpecies)==1){
+		if(unluckyGuild=="rows"){
+		  if(unluckySpecies %in% extinct_rows){stop('Specified target species for the primary extinction is already extinct')}
+		  coext_rows <- unluckySpecies
+		  degree_when_lost_rows <- 1 #stores the degree of the extinction event of every row lost during the coextinction cascade.
+		}
+		if(unluckyGuild=="cols"){
+		  if(unluckySpecies %in% extinct_cols){stop('Specified target species for the primary extinction is already extinct')}
+		  coext_cols <- unluckySpecies
+		  degree_when_lost_cols <- 1
+		}
+	  }else{
+		nspecies <- switch(unluckyGuild, rows = nrows, cols = ncols)
+		if(length(unluckySpecies)==nspecies){
+		  if(unluckyGuild =="rows"){
+			alive <- rows[is.na(rowsNA)==FALSE]
+			coext_rows <- sample(c(alive,0),1,prob = c(unluckySpecies[is.na(rowsNA)==FALSE],0))
+			degree_when_lost_rows <- 1
+		  }
+		  if(unluckyGuild =="cols"){
+			alive <- cols[is.na(colsNA)==FALSE]
+			coext_cols <- sample(c(alive,0),1,prob = c(unluckySpecies[is.na(colsNA)==FALSE],0))
+			degree_when_lost_cols <- 1
+		  }
+		}else{
+		  stop('Length of "unluckySpecies" must be 1 (specifying a single species within the unlucky guild) or else be equal to the number of species in the unlucky guild (specifying probabilities of primary extinction for each species in the unlucky guild)')
+		}
+	  }
   }
   imatrix[coext_rows,] <- 0
   imatrix[,coext_cols] <- 0
@@ -232,7 +234,7 @@ netcascade_JO <- function(
       	# This is the first place R is used; modify accordingly, e.g.
       	# R_cols
       	# ...Cull a column if its value of P is greater than that of the remaining columns (drawn from uniform dist?)
-        unlucky <- R_val_col[remaining_cols]*M[extinct_rows[i],remaining_cols,1] > runif(length(remaining_cols))
+        unlucky <- R_val_col[remaining_cols]*interaction_strength[extinct_rows[i],remaining_cols,1] > runif(length(remaining_cols))
         coext_cols = c(coext_cols, remaining_cols[unlucky])
       }
       coext_rows <- c()
@@ -245,9 +247,9 @@ netcascade_JO <- function(
       # make its interaction strengths zero; recalculate interaction strengths
       for(i in 1:ncols){
         if(sum(imatrix[,i])==0){
-          M[,i,1] <- 0
+          interaction_strength[,i,1] <- 0
         }else{
-          M[,i,1] <- imatrix[,i]/sum(imatrix[,i])
+          interaction_strength[,i,1] <- imatrix[,i]/sum(imatrix[,i])
         }
       }
       # add a degree if there were additional columns extinct (why just 1?)
@@ -258,7 +260,7 @@ netcascade_JO <- function(
       }
     }else{
       for(i in 1:length(extinct_cols)){
-        unlucky <- R_val_row[remaining_rows]*M[remaining_rows,extinct_cols[i],2] > runif(length(remaining_rows))
+        unlucky <- R_val_row[remaining_rows]*interaction_strength[remaining_rows,extinct_cols[i],2] > runif(length(remaining_rows))
         coext_rows <- c(coext_rows, remaining_rows[unlucky])
       }
       coext_cols = c();
@@ -268,9 +270,9 @@ netcascade_JO <- function(
       imatrix[coext_rows,] <- 0
       for(i in 1:nrows){
         if(sum(imatrix[i,])==0){
-          M[i,,2] <- 0
+          interaction_strength[i,,2] <- 0
         }else{
-          M[i,,2] <- imatrix[i,]/sum(imatrix[i,])
+          interaction_strength[i,,2] <- imatrix[i,]/sum(imatrix[i,])
         }
       }
       if(length(coext_rows)>0){
