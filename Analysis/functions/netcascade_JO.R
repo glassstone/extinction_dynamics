@@ -179,15 +179,19 @@ netcascade_JO <- function(
   #-----------CHOOSING TARGET SPECIES FOR PRIMARY EXTINCTION---
   coext_rows <- c()
   coext_cols <- c()
-  if(is.numeric(unluckySpecies)){
+  if(is.numeric(unluckySpecies) == TRUE){
 	  if(length(unluckySpecies)==1){
 		if(unluckyGuild=="rows"){
-		  if(unluckySpecies %in% extinct_rows){stop('Specified target species for the primary extinction is already extinct')}
+		  if(unluckySpecies %in% extinct_rows){
+			  stop('Specified target species for the primary extinction is already extinct')
+		  }
 		  coext_rows <- unluckySpecies
 		  degree_when_lost_rows <- 1 #stores the degree of the extinction event of every row lost during the coextinction cascade.
 		}
 		if(unluckyGuild=="cols"){
-		  if(unluckySpecies %in% extinct_cols){stop('Specified target species for the primary extinction is already extinct')}
+		  if(unluckySpecies %in% extinct_cols){
+			  stop('Specified target species for the primary extinction is already extinct')
+		  }
 		  coext_cols <- unluckySpecies
 		  degree_when_lost_cols <- 1
 		}
@@ -195,20 +199,67 @@ netcascade_JO <- function(
 		nspecies <- switch(unluckyGuild, rows = nrows, cols = ncols)
 		if(length(unluckySpecies)==nspecies){
 		  if(unluckyGuild =="rows"){
-			alive <- rows[is.na(rowsNA)==FALSE]
-			coext_rows <- sample(c(alive,0),1,prob = c(unluckySpecies[is.na(rowsNA)==FALSE],0))
+			alive_rows <- rows[is.na(rowsNA)==FALSE]
+			coext_rows <- sample(c(alive_rows,0),1,prob = c(unluckySpecies[is.na(rowsNA)==FALSE],0))
 			degree_when_lost_rows <- 1
 		  }
 		  if(unluckyGuild =="cols"){
-			alive <- cols[is.na(colsNA)==FALSE]
-			coext_cols <- sample(c(alive,0),1,prob = c(unluckySpecies[is.na(colsNA)==FALSE],0))
+			alive_cols <- cols[is.na(colsNA)==FALSE]
+			coext_cols <- sample(c(alive_cols,0),1,prob = c(unluckySpecies[is.na(colsNA)==FALSE],0))
 			degree_when_lost_cols <- 1
 		  }
 		}else{
 		  stop('Length of "unluckySpecies" must be 1 (specifying a single species within the unlucky guild) or else be equal to the number of species in the unlucky guild (specifying probabilities of primary extinction for each species in the unlucky guild)')
 		}
 	  }
+  } else if(unluckySpecies == "random_abundance"){
+  # unluckySpecies options: numeric (1:nrow or 1:ncol), "random_abundance", "random_binary"
+	  if(unluckyGuild=="rows"){
+		alive_rows <- rows[is.na(rowsNA)==FALSE]
+		coext_rows <- sample(
+						x = alive_rows,
+						size = 1,
+						replace = FALSE,
+						prob = rowSums(imatrix[alive_rows,])
+			)
+		degree_when_lost_rows <- 1 #stores the degree of the extinction event of every row lost during the coextinction cascade.
+	  }
+	  if(unluckyGuild=="cols"){
+		alive_cols <- cols[is.na(colsNA)==FALSE]
+		coext_cols <- sample(
+						x = alive_cols,
+						size = 1,
+						replace = FALSE,
+						prob = colSums(imatrix[,alive_cols])
+			)
+		degree_when_lost_cols <- 1
+	  }
+  } else if(unluckySpecies == "random_binary"){
+	  if(unluckyGuild=="rows"){
+		alive_rows <- rows[is.na(rowsNA)==FALSE]
+		coext_rows <- sample(
+						x = alive_rows,
+						size = 1,
+						replace = FALSE,
+						prob = NULL
+			)
+		degree_when_lost_rows <- 1 #stores the degree of the extinction event of every row lost during the coextinction cascade.
+	  }
+	  if(unluckyGuild=="cols"){
+		alive_cols <- cols[is.na(colsNA)==FALSE]
+		coext_cols <- sample(
+						x = alive_cols,
+						size = 1,
+						replace = FALSE,
+						prob = NULL
+			)
+		degree_when_lost_cols <- 1
+	  }
+  } else {
+	  stop('Could not evaluate your non-numeric value for the "unluckySpecies" argument.')
   }
+
+
   imatrix[coext_rows,] <- 0
   imatrix[,coext_cols] <- 0
 
@@ -304,18 +355,18 @@ netcascade_JO <- function(
 }
 
 # test:
-# animal <- c("fish", "chicken", "shrimp", "bee")
-# animals <- rep(animal, times = c(1,2,3,4))
-# plant <- c("cactus", "orchid")
-# plants <- rep(plant, times = c(8, 2))
-# intmat <- table(animals, plants)
-# intmat <- as.matrix(as.data.frame.matrix(intmat))
+animal <- c("fish", "chicken", "shrimp", "bee")
+animals <- rep(animal, times = c(1,2,3,4))
+plant <- c("cactus", "orchid")
+plants <- rep(plant, times = c(8, 2))
+intmat <- table(animals, plants)
+intmat <- as.matrix(as.data.frame.matrix(intmat))
 
-# netcascade_JO(
-	# imatrix = intmat,
-	# R_rows = "exp",
-	# R_cols = "power",
-	# unluckyGuild = "random_richness",
-	# unluckySpecies = 2,
-	# return.matrix = FALSE
-	# )
+netcascade_JO(
+	imatrix = intmat,
+	R_rows = "exp",
+	R_cols = "power",
+	unluckyGuild = "random_richness",
+	unluckySpecies = "random_binary",
+	return.matrix = FALSE
+	)
