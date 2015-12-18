@@ -337,9 +337,6 @@ netcascade_JO <- function(
 
   #-------------------OUTPUT---------------------------
 
-  if(return.matrix==TRUE){
-    return(list(interaction_matrix = imatrix, lost_rows = lost_rows, lost_cols = lost_cols, primary_extinction = c(unluckyGuild, unluckySpecies)))
-  }else{
     if(length(lost_rows)>0){
       spp_data_rows <- data.frame(lost_rows = lost_rows, degree_of_extinction = degree_when_lost_rows)
     }else{
@@ -350,23 +347,41 @@ netcascade_JO <- function(
     }else{
       spp_data_cols <- "No columns were lost"
     }
-    return(list(cascade_data = degree_table, rows_species_data = spp_data_rows , cols_species_data = spp_data_cols, primary_extinction = c(unluckyGuild, unluckySpecies)))
+  if(return.matrix==TRUE){
+    return(
+		list(
+			interaction_matrix = imatrix,
+			lost_rows = lost_rows,
+			lost_cols = lost_cols,
+			cascade_data = degree_table,
+			rows_species_data = spp_data_rows,
+			cols_species_data = spp_data_cols
+			)
+		)
+  }else{
+    return(
+		list(
+			cascade_data = degree_table,
+			rows_species_data = spp_data_rows,
+			cols_species_data = spp_data_cols
+			)
+		)
   }
 }
 
 # test:
-animal <- c("fish", "chicken", "shrimp", "bee")
-animals <- rep(animal, times = c(1,2,3,4))
-plant <- c("cactus", "orchid")
-plants <- rep(plant, times = c(8, 2))
-intmat <- table(animals, plants)
-intmat <- as.matrix(as.data.frame.matrix(intmat))
-
-netcascade_JO(
-	imatrix = intmat,
-	R_rows = "exp",
-	R_cols = "power",
-	unluckyGuild = "random_richness",
-	unluckySpecies = "random_binary",
-	return.matrix = FALSE
-	)
+# animal <- c("fish", "chicken", "shrimp", "bee")
+# animals <- rep(animal, times = c(1,2,3,4))
+# plant <- c("cactus", "orchid")
+# plants <- rep(plant, times = c(8, 2))
+# intmat <- table(animals, plants)
+# intmat <- as.matrix(as.data.frame.matrix(intmat))
+#
+# netcascade_JO(
+# 	imatrix = intmat,
+# 	R_rows = "exp",
+# 	R_cols = "power",
+# 	unluckyGuild = "random_richness",
+# 	unluckySpecies = "random_binary",
+# 	return.matrix = TRUE
+# 	)
