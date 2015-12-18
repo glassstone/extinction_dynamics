@@ -1,6 +1,8 @@
 #(December 8 2015).
 
-# The R arguments can be a character string specifying an option (e.g. "normal", "VAlow", etc), or a numeric vector of length 1 or length == number of rows or columns. If a single number is given, this number is applied to all species in that guild.
+# The R arguments (R_rows, R_cols) can be a character string specifying an option (e.g. "normal", "VAlow", etc), or a numeric vector of length 1 or length == number of rows or columns. If a single number is given, this number is applied to all species in that guild.
+# unluckyGuild options: c("rows", "cols", "random_richness", "random_binary") (VA2015 used random_richness)
+# unluckySpecies options: numeric (1:nrow or 1:ncol), "random_abundance", "random_binary"
 netcascade_JO <- function(
 					imatrix,
 					R_rows,
@@ -26,12 +28,12 @@ netcascade_JO <- function(
   	# The length of vector'R_cols' must be equal to number of columns in 'imatrix'
   	# ")}
 
-  if((unluckyGuild %in% c("rows","cols")) == FALSE){ # random_abundance, random_binary
+  if((unluckyGuild %in% c("rows","cols", "random_richness", "random_binary")) == FALSE){
 	  stop('
-  	Invalid target guild for primary extinction. Valid targets guilds are "rows" and "cols"
+  	Invalid target guild for primary extinction. Valid targets guilds are "rows", "cols", "random_richness", and "random_binary"
   	')}
 
-  if(is.numeric(unluckySpecies)==FALSE){ # random_abundance, random_binary
+  if(is.numeric(unluckySpecies)==FALSE && !(unluckySpecies %in% c("random_abundance", "random_binary"))){
 	  stop('
   	Invalid value for the "unluckySpecies" argument. You may specify a single species by entering its row or column number or you may use a vector of relative probabilites for all species in the unlucky guild.
   	')}
@@ -156,6 +158,23 @@ netcascade_JO <- function(
   } #matrix of rows' dependence on each column
 
 
+  #-----------CHOOSING TARGET GUILD FOR PRIMARY EXTINCTION---
+  if(unluckyGuild == "random_richness"){
+	  unluckyGuild <- sample(
+					x = c("rows","cols"),
+					size = 1,
+					replace = FALSE,
+					prob = c(nrow(imatrix),ncol(imatrix))
+					)
+  }
+  if(unluckyGuild == "random_binary"){
+	  unluckyGuild <- sample(
+					x = c("rows","cols"),
+					size = 1,
+					replace = FALSE,
+					prob = NULL
+					)
+  }
 
   #-----------CHOOSING TARGET SPECIES FOR PRIMARY EXTINCTION---
   coext_rows <- c()
@@ -266,7 +285,7 @@ netcascade_JO <- function(
   #-------------------OUTPUT---------------------------
 
   if(return.matrix==TRUE){
-    return(list(interaction_matrix = imatrix, lost_rows = lost_rows, lost_cols = lost_cols))
+    return(list(interaction_matrix = imatrix, lost_rows = lost_rows, lost_cols = lost_cols, primary_extinction = c(unluckyGuild, unluckySpecies)))
   }else{
     if(length(lost_rows)>0){
       spp_data_rows <- data.frame(lost_rows = lost_rows, degree_of_extinction = degree_when_lost_rows)
@@ -278,7 +297,7 @@ netcascade_JO <- function(
     }else{
       spp_data_cols <- "No columns were lost"
     }
-    return(list(cascade_data = degree_table, rows_species_data = spp_data_rows , cols_species_data = spp_data_cols))
+    return(list(cascade_data = degree_table, rows_species_data = spp_data_rows , cols_species_data = spp_data_cols, primary_extinction = c(unluckyGuild, unluckySpecies)))
   }
 }
 
@@ -290,4 +309,11 @@ netcascade_JO <- function(
 # intmat <- table(animals, plants)
 # intmat <- as.matrix(as.data.frame.matrix(intmat))
 
-# netcascade_JO(imatrix = intmat, R_rows = "exp", R_cols = "cats", unluckyGuild = "rows", unluckySpecies = 2, return.matrix = TRUE)
+# netcascade_JO(
+	# imatrix = intmat,
+	# R_rows = "exp",
+	# R_cols = "power",
+	# unluckyGuild = "random_richness",
+	# unluckySpecies = 2,
+	# return.matrix = FALSE
+	# )
