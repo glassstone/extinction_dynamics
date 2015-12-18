@@ -35,9 +35,19 @@
 
 %------------------------------------TITLE--------------------------------------
 
-\title{This is the new and improved title}
+\title{This is a manuscript about extinction cascades.}
 
 %-----------------------------------AUTHORS-------------------------------------
+
+
+% See section "Author Contributions" below:
+%Conceived and designed the experiments: MP, JO.
+%Collected the data: MP, DH, CD-C.
+%Conducted the analyses: JO, MP.
+%Wrote the first draft: .
+%Edited the manuscript: .
+
+
 
 % using package 'authblk':
 \author[1]{First Author\thanks{first.author@funstuff.com}}
@@ -77,6 +87,8 @@ This is the text of the abstract.
 
 %---------------------------------INTRODUCTION----------------------------------
 \section*{Introduction}
+
+Vieira and Almeida-Neta (2015) = VA2015.
 For centuries, humankind has wondered: If I have two apples, and someone gives me another two apples, how many apples do I have? Some people did this \citep{Darwin1859}
 
 One example of a species with a low dependence on a mutualistic network (R) is plants that have the ability to self-pollinate. 
@@ -86,7 +98,15 @@ One example of a species with a low dependence on a mutualistic network (R) is p
 \section*{Methods}
 We modeled the distribution of plants' reliance on pollination after empirical assessment of the rate of selfing and outcrossing for 169 animal-pollinated species (CITE Vogler and Kalisz 2001 EVO). This distribution is multimodal; thus we drew from a binomial distribution to subsequently drew from either of two beta distributions with shape parameters 0.8 and 2 or 13 and 4.
 
-A species was removed at random (unless we think it's important to choose based on either a species' R (dependence on network) or it's degree (number of interactions) or H' (distribution of interaction strengths).
+
+Species can be chosen for primary extinction in one of SEVERAL ways. First, a guild is chosen.
+(1) Guild is chosen at random with equal probability.
+(2) Guild is chosen at random with probability = relative proportion of species in that guild.
+Then, a species is removed, either:
+(1) Species is chosen at random with equal probability across all species in the guild.
+(2) Species is chosen at random with probability = relative abundance.
+
+Alternatively, we can choose based on either a species' R (dependence on network) or it's degree (number of interactions) or H' (distribution of interaction strengths), or...?
 
 We conducted simulations on XXX networks collected primarily from the Interaction Web Database ?(NCEAS? CITATION?).
 
