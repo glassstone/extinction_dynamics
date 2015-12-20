@@ -66,10 +66,12 @@ netcascade_JO <- function(
 	  1, 1, # unif
 	  3, 3, # normal
 	  4, 0.1, # left
-	  0.2, 0.2 # binomial
+	  0.2, 0.2, # binomial
+	  0.8, 2, # Vogler2001 bimodal left side
+	  13, 4 # Vogler2001 bimodal right side
 	  ), byrow = TRUE, ncol = 2)
-  rownames(beta.par)=c("exp","power","unif","normal","left", "bimod")
-  R_options <- c("VA_low", "VA_med", "VA_high", rownames(beta.par))
+  rownames(beta.par)=c("exp","power","unif","normal","left", "bimod", "Vogler2001_L", "Vogler2001_R")
+  R_options <- c("VA_low", "VA_med", "VA_high", "Vogler2001", rownames(beta.par))
 
   # could replace the mess below with:
   # if( R_rows %in% R_options ){
@@ -88,6 +90,8 @@ netcascade_JO <- function(
 		R_val_row <- rep(runif(1, min = 0.3, max = 0.6), nrow(imatrix))
 	} else if(R_rows == "VA_high"){
 		R_val_row <- rep(runif(1, min = 0.6, max = 1), nrow(imatrix))
+	} else if(R_rows == "Vogler2001"){
+		R_val_row <- rbeta_bimod(n = nrow(imatrix), beta1shape1 = beta.par["Vogler2001_L", 1], beta1shape2 = beta.par["Vogler2001_L", 2], beta2shape1 = beta.par["Vogler2001_R", 1], beta2shape2 = beta.par["Vogler2001_R", 2])
 	} else if(R_rows == "exp"){
 		R_val_row <- rbeta(nrow(imatrix), shape1 = beta.par["exp", 1], shape2 = beta.par["exp", 2])
 	} else if(R_rows == "power"){
@@ -120,6 +124,8 @@ netcascade_JO <- function(
 		R_val_col <- rep(runif(1, min = 0.3, max = 0.6), ncol(imatrix))
 	} else if(R_cols == "VA_high"){
 		R_val_col <- rep(runif(1, min = 0.6, max = 1), ncol(imatrix))
+	} else if(R_cols == "Vogler2001"){
+		R_val_col <- rbeta_bimod(n = ncol(imatrix), beta1shape1 = beta.par["Vogler2001_L", 1], beta1shape2 = beta.par["Vogler2001_L", 2], beta2shape1 = beta.par["Vogler2001_R", 1], beta2shape2 = beta.par["Vogler2001_R", 2])
 	} else if(R_cols == "exp"){
 		R_val_col <- rbeta(ncol(imatrix), shape1 = beta.par["exp", 1], shape2 = beta.par["exp", 2])
 	} else if(R_cols == "power"){
