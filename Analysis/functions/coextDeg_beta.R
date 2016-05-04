@@ -5,16 +5,20 @@
 # primary extinctions in each trophic level (e.g. T1 and T2) are drawn from a beta distribution with two shape parameters for each trophic level (beta_par1_T1, beta_par2_T1, beta_par1_T2, beta_par2_T2)
 
 
-coextDeg_beta <- function(imatrix, nsims, beta_par1_T1 = 1, beta_par2_T1 = 1,beta_par1_T2 = 1, beta_par2_T2 = 1){
+coextDeg_beta <- function(imatrix, nsims, beta_par1_T1 = 1, beta_par2_T1 = 1,beta_par1_T2 = 1, beta_par2_T2 = 1,guild=NULL,target=NULL){
   degs <- c()
   for(sim in 1:nsims){
     R_rows <- rbeta(n = nrow(imatrix), shape1 = beta_par1_T1, shape2 = beta_par2_T1)
     R_cols <- rbeta(n = ncol(imatrix), shape1 = beta_par1_T2, shape2 = beta_par2_T2)
-    guild <- sample(c('rows','cols'),1,F,c(nrow(imatrix),ncol(imatrix)))
-    if(guild=="animal"){
-      target <- rep(1,nrow(imatrix)) #same probability of primary extinction for all spp
-    }else{
-      target <- rep(1,ncol(imatrix)) #same probability of primary extinction for all spp
+    if (is.null(guild)){ #ADDED
+      guild <- sample(c('rows','cols'),1,F,c(nrow(imatrix),ncol(imatrix)))
+    }
+    if (is.null(target)){ #ADDED
+      if(guild=="rows"){ #CHANGED - it was animal before
+        target <- rep(1,nrow(imatrix)) #same probability of primary extinction for all spp
+      }else{
+        target <- rep(1,ncol(imatrix)) #same probability of primary extinction for all spp
+      }
     }
     profiles <- netcascade_JO(
 							imatrix = imatrix, 
