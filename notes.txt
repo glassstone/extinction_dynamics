@@ -1,0 +1,98 @@
+# 1 - How different distributions of R facilitate or buffer extinction cascades?
+
+- Pick the trophic level of the initial extinction at random
+
+- pick the species for extinction on the basis of:
+  - abundance
+  - R
+  - specialization
+  - degree
+  - something else? See Memmott 2004 for motivation
+
+- analyze and plot:
+  - cascade degree and frequency
+    as a function of:
+  - initial species traits
+
+
+# 2. How is the disassembly process under different R distributions after the loss of important species?
+- For all simulations
+  - either keep all networks along the way, or 
+    make calculations to be kept along the way
+
+  2.1 analyze and plot:
+  - topological properties
+    as a function of:
+  - timestep
+    accounting for differences in initial species properties
+    
+  ??? This will produce a bunch of lines; what analysis? time of first collapse?
+
+  2.2 analyze and plot:
+  - species' trait over time degree, strength
+    as a function of:
+  - timestep
+    accounting for differences in initial species properties
+
+  2.3 analyze and plot (sensitivity analysis?)
+  - disassembly trajectory
+    as a function of 
+  - rank of initial species lost
+
+# 3. test on empirical distributions of R
+  - what are the expected distributions of R in different interactions/habitats
+  - search for empirical data of R distribution
+  - test on empirical distributions of R
+
+
+Supplementary info:
+	previous analysis on the effects of R distributions on the degree and frequency of cascades
+
+
+
+
+
+
+
+
+
+species level properties to consider:
+degree,         
+ND for normalised degrees,                  
+species strength as sum of dependencies for each species,         
+nestedrank as rank in a nested matrix,         
+interaction push pull for interaction push/pull (our version of dependence asymmetry: see details),          
+PDI for Paired Differences Index,          
+resource range for Poisot et al. (2012)'s index of unused resources,          
+species specificity (or coefficient of variation of interactions),         
+PSI for pollination service index (or pollinator support index, depending on the trophic level),          
+NS for node specialisation index,         
+betweenness for betweenness,         
+closeness (both automatically also return their weighted counterparts proposed by Tore Opsahl in package tnet),         
+Fisher for Fisher's alpha index,         
+diversity for Shannon diversity of interactions of that species,         
+effective partners for the effective number of interacting partners,         
+proportional generality a quantitative version of normalised degree,         
+proportional similarity specialisation measured as similarity between use and availability,         
+d for Blthgen's d',         
+
+networklevel properties to consider:
+connectance,
+web asymmetry,
+links per species,
+number of compartments,
+compartment diversity,
+cluster coefficient, which will compute both the network-wide cluster coefficient as well as those for each level,
+nestedness,
+weighted nestedness,
+weighted NODF,
+ISA (or alternatively interaction strength asymmetry or     
+dependence asymmetry),
+SA (or alternatively specialisation asymmetry),
+linkage density,
+weighted connectance,
+Fisher alpha,
+interaction evenness,
+Alatalo interaction evenness,
+Shannon diversity,
+H2;
