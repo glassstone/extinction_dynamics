@@ -1,5 +1,7 @@
 
 # First, you must set your working directory to extinctions/Analysis
+analysis_dir <- dirname(file.choose()) # choose this script file
+setwd(analysis_dir)
 
 # point to the data directory
 data_dir <- file.path("..", "Data")
