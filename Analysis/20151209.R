@@ -10,7 +10,7 @@ data_dir <- file.path("..", "Data")
 fig_dir <- file.path("..", "Figures")
 
 # load the functions - this will source all files ending in '.R'
-sapply(list.files(pattern="[.]R$", path="functions/", full.names=TRUE), source)
+sapply(list.files(pattern="[.]R$", path="functions", full.names=TRUE), source)
 # source("functions/netcascade_JO.R")
 # source("functions/extinction_cascader.R")
 
