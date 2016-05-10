@@ -100,39 +100,6 @@ length(mat_empirical) # no full networks are lost, only species
 
 
 
-#===============================================================================
-#------------- SET R OPTIONS
-#===============================================================================
-# We conducted simulations by assignment
-beta.par <- matrix(
-	c(
-		0.1, 1,
-		0.5, 1,
-		1, 1,
-		8, 8,
-		4, 0.1,
-		0.2, 0.2
-		), byrow = TRUE, ncol = 2)
-
-rownames(beta.par)=c("exp","power","unif","normal","left", "bimod")
-R_options <- c("VA_low", "VA_med", "VA_high", rownames(beta.par))
-
-R_options_full <- expand.grid(row_R = R_options, col_R = R_options, stringsAsFactors = FALSE)
-
-R_scenario <- paste(R_options_full[,"row_R"], R_options_full[,"col_R"], sep = "-")
-
-R_options_full <- data.frame(scenario, R_options_full)
-
-# this is now 'scenario'
-# R_combo_names <- apply(X = as.matrix(R_options_full), MARGIN = 1, FUN = function(x) paste(x, sep = "", collapse = "-"))
-
-
-flip_reverse <- function(x){
-	paste(rev(strsplit(x, split = "-")[[1]]), collapse = "-")
-}
-R_scenario_flip <- sapply(R_scenario, flip_reverse)
-R_combo_df <- cbind(R_scenario, R_scenario_flip)
-
 # We obtain similar results when drawing R from a distribution that reflect VA's scheme:
 # VAlow ~ exp
 # VAmed ~ normal
@@ -145,11 +112,10 @@ R_combo_df <- cbind(R_scenario, R_scenario_flip)
 #
 
 
-
 # 3  VA_high  VA_low
 R_symmetrical <- R_options_full[
 	apply(
-		X = R_options_full[,2:3],
+		X = R_options_full,
 		MARGIN = 1,
 		FUN = function(x) identical(as.character(x[1]), as.character(x[2]))
 		),
@@ -191,8 +157,6 @@ R_assymetrical <- data.frame(
 
 )
 
-?expand.grid
-
 
 R_options_full[1,2:3][,2]
 
@@ -200,6 +164,7 @@ R_options_full[1,2:3][,2]
 # set
 R_input <- R_options_full# for all options, use: R_options_full
 
+R_options <- c(beta_par_R$name[1:8])
 #===============================================================================
 #------------- RUN THE SIMULATIONS
 #===============================================================================
